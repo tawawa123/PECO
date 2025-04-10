@@ -40,7 +40,8 @@ namespace StateManager
         // 各メソッドの呼び出し
         private StateMachine<PlayerController> stateMachine;
         private AttackArea AA;
-        private PlayerStatus pStatus;
+        private PlayerStatus playerStatus;
+        private AwaitableAnimatorState animationState;
         private Rigidbody rb;
         private Animator animator;
         private PlayerLockon playerLo;
@@ -49,8 +50,9 @@ namespace StateManager
         void Start() {
             rb = GetComponent<Rigidbody>();
             animator = GetComponent<Animator>();
-            pStatus = GetComponent<PlayerStatus>();
+            playerStatus = GetComponent<PlayerStatus>();
             playerLo = GetComponent<PlayerLockon>();
+            animationState = GetComponent<AwaitableAnimatorState>();
 
             // ステートの登録
             stateMachine = new StateMachine<PlayerController>(this);
@@ -74,14 +76,14 @@ namespace StateManager
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
 
-            if(pStatus.Hp <= 0)
+            if(playerStatus.Hp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
 
             if (moveForward != Vector3.zero)
             {
                 if (playerLo.isLockon)
                 {
-                    // ロックオンかつ非Run時はターゲットに向き続ける
+                    // ロックオン中はターゲットを向き続ける
                     Quaternion from = transform.rotation;
                     var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
                     dir.y = 0;
@@ -117,12 +119,13 @@ namespace StateManager
                 }
             }
 
-            if(closest = null){
+            if(closest == null){
                 return backstab;
             }
             
             float Angle = Vector3.Angle(closest.transform.forward, this.transform.forward);
-            if(Mathf.Abs(Angle) > 10.0f){
+            Debug.Log(Mathf.Abs(Angle));
+            if(Mathf.Abs(Angle) < 20.0f){
                 backstab = true;
             }
 
@@ -147,17 +150,27 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                // Move
                 if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f){
-                    Owner.animator.SetBool("Run", true);
+                    Owner.animationState.SetState("Run", true);
                     StateMachine.ChangeState((int) StateType.Move);
                 }
 
+                // Avoid
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
+                    Owner.animationState.SetState("ScrewKick");
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
+                // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
-                    StateMachine.ChangeState((int) StateType.Attack);
+                    if(Owner.Backstab()){
+                        Owner.animationState.SetState("Spinkick");
+                        StateMachine.ChangeState((int) StateType.Backstab);
+                    }else{
+                        Owner.animationState.SetState("Jab");
+                        StateMachine.ChangeState((int) StateType.Attack);
+                    }
                 }
             }
 
@@ -187,22 +200,33 @@ namespace StateManager
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.RotationRate);
                 }
 
+                // Idle
                 if(Owner.rb.velocity.magnitude < 0.1f){
+                    Owner.animationState.SetState("Idle");
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
 
+                // Avoid
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
+                    Owner.animationState.SetState("ScrewKick");
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
+                // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
-                    StateMachine.ChangeState((int) StateType.Attack);
+                    if(Owner.Backstab()){
+                        Owner.animationState.SetState("Spinkick");
+                        StateMachine.ChangeState((int) StateType.Backstab);
+                    } else{
+                        Owner.animationState.SetState("Jab");
+                        StateMachine.ChangeState((int) StateType.Attack);
+                    }
                 }
             }
 
             public override void OnEnd()
             {
-                Owner.animator.SetBool("Run", false);
+                Owner.rb.velocity = Vector3.zero;
                 Debug.Log("end move");
             }
         }
@@ -211,33 +235,33 @@ namespace StateManager
         // avoid state 
         private class StateAvoid : StateBase
         {
+            private bool once;
+
             public override void OnStart()
             {
+                once = true;
                 Debug.Log("start avoid");
             }
 
             public override void OnUpdate()
             {
-                //Owner.rb.AddForce(Owner.moveForward * Owner.avoidPower, ForceMode.Impulse);
-                //DelayAsync();
-                if(Owner.rb.velocity.magnitude >= 0.1f){
-                    Owner.rb.AddForce(Owner.moveForward * Owner.avoidPower * 10, ForceMode.Impulse);
-                } else {
-                    Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
+                if(once){
+                    if(Owner.rb.velocity.magnitude >= 0.1f){
+                        Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
+                    } else {
+                        Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
+                    }
+                    once = false;
                 }
-                StateMachine.ChangeState((int) StateType.Idle);
+                
+                // アニメーションが終了した時にIdleに遷移
+                if(Owner.animationState.AnimtionFinish("ScrewKick") >= 1f)
+                    StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end avoid");
-            }
-
-            private async void DelayAsync()
-            {
-                //0.2秒間回避時間
-                await Task.Delay(200);
-                StateMachine.ChangeState((int) StateType.Idle);
             }
         }
 
@@ -292,7 +316,10 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Debug.Log("バクスタ判定が出ました！");
 
+                if(Owner.animationState.AnimtionFinish("Spinkick") >= 1f)
+                    StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
@@ -334,21 +361,15 @@ namespace StateManager
             public override void OnUpdate()
             {
                 Owner.AA.StartAttackHit();
-                DelayAsync();
-                StateMachine.ChangeState((int) StateType.Idle);
+
+                // 攻撃アニメーションが終了したらIdleに遷移
+                if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
+                    StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end attack");
-            }
-
-            private async void DelayAsync()
-            {
-                //0.2秒間回避時間
-                await Task.Delay(200);
-                
-                StateMachine.ChangeState((int) StateType.Idle);
             }
         }
 
