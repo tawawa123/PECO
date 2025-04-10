@@ -37,16 +37,18 @@ namespace StateManager
         }
 
 
-        // 自作メソッドの呼び出し
+        // 各メソッドの呼び出し
         private StateMachine<PlayerController> stateMachine;
         private AttackArea AA;
         private PlayerStatus pStatus;
         private Rigidbody rb;
+        private Animator animator;
         private PlayerLockon playerLo;
 
 
         void Start() {
             rb = GetComponent<Rigidbody>();
+            animator = GetComponent<Animator>();
             pStatus = GetComponent<PlayerStatus>();
             playerLo = GetComponent<PlayerLockon>();
 
@@ -146,6 +148,7 @@ namespace StateManager
             public override void OnUpdate()
             {
                 if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f){
+                    Owner.animator.SetBool("Run", true);
                     StateMachine.ChangeState((int) StateType.Move);
                 }
 
@@ -175,9 +178,6 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if(Owner.rb.velocity.magnitude < 0.1f){
-                    StateMachine.ChangeState((int) StateType.Idle);
-                }
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
@@ -185,6 +185,10 @@ namespace StateManager
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.RotationRate);
+                }
+
+                if(Owner.rb.velocity.magnitude < 0.1f){
+                    StateMachine.ChangeState((int) StateType.Idle);
                 }
 
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
@@ -198,6 +202,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
+                Owner.animator.SetBool("Run", false);
                 Debug.Log("end move");
             }
         }
@@ -216,9 +221,9 @@ namespace StateManager
                 //Owner.rb.AddForce(Owner.moveForward * Owner.avoidPower, ForceMode.Impulse);
                 //DelayAsync();
                 if(Owner.rb.velocity.magnitude >= 0.1f){
-                    Owner.rb.AddForce(Owner.moveForward * Owner.avoidPower * 10, ForceMode.Force);
+                    Owner.rb.AddForce(Owner.moveForward * Owner.avoidPower * 10, ForceMode.Impulse);
                 } else {
-                    Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Force);
+                    Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
                 }
                 StateMachine.ChangeState((int) StateType.Idle);
             }
@@ -329,14 +334,21 @@ namespace StateManager
             public override void OnUpdate()
             {
                 Owner.AA.StartAttackHit();
-                //Owner.AA.EndAttackHit();
-                //Task.Run(Owner.DelayAttackArea);
+                DelayAsync();
                 StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end attack");
+            }
+
+            private async void DelayAsync()
+            {
+                //0.2秒間回避時間
+                await Task.Delay(200);
+                
+                StateMachine.ChangeState((int) StateType.Idle);
             }
         }
 

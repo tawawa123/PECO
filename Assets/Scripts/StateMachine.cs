@@ -8,7 +8,7 @@ namespace StateManager
     /// ステートマシンクラス
     /// class定義の基底クラス切り出し版
     /// </summary>
-    public class StateMachine<TOwner> : MonoBehaviour
+    public class StateMachine<TOwner>
     {
         /// <summary>
         /// ステート基底クラス
