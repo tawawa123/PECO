@@ -26965,3 +26965,417 @@ AssetImportParameters requested are different than current active one (requested
   custom:scripting/monoscript/fileName/UnityWebRequestException.cs: 2f89594a450491fa97181818dc809735 -> 
   custom:scripting/monoscript/fileName/Buffer.cs: 289f5930a1bbfbf6d8aac98cd21fd44c -> 
   custom:scripting/precompiled-assembly-types:Assembly-CSharp-Editor:  -> 0ab3baead673a6c47fc08ace350d1536
+========================================================================
+Received Prepare
+Caller must complete domain reload
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.389 seconds
+Native extension for WindowsStandalone target not found
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.930 seconds
+Domain Reload Profiling: 1317ms
+	BeginReloadAssembly (125ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (4ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (26ms)
+	RebuildCommonClasses (24ms)
+	RebuildNativeTypeToScriptingClass (8ms)
+	initialDomainReloadingComplete (27ms)
+	LoadAllAssembliesAndSetupDomain (204ms)
+		LoadAssemblies (240ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (29ms)
+			TypeCache.Refresh (8ms)
+				TypeCache.ScanAssembly (0ms)
+			ScanForSourceGeneratedMonoScriptInfo (11ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (930ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (449ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (6ms)
+			SetLoadedEditorAssemblies (3ms)
+			RefreshPlugins (0ms)
+			BeforeProcessingInitializeOnLoad (74ms)
+			ProcessInitializeOnLoadAttributes (332ms)
+			ProcessInitializeOnLoadMethodAttributes (29ms)
+			AfterProcessingInitializeOnLoad (4ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (5ms)
+Refreshing native plugins compatible for Editor in 3.29 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 3897 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 14 unused Assets / (99.2 KB). Loaded Objects now: 6266.
+Memory consumption went from 145.6 MB to 145.5 MB.
+Total: 4.010800 ms (FindLiveObjects: 0.812900 ms CreateObjectMapping: 0.222000 ms MarkObjects: 2.911600 ms  DeleteObjects: 0.063000 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:scripting/monoscript/fileName/ToDictionary.cs: 853f26c16995d1a07dc3a2f1cfc74045 -> 
+  custom:scripting/monoscript/fileName/OfType.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/TaskTracker.cs: 82c2ecb245b909a00defd6a9a4a657d5 -> 
+  custom:scripting/monoscript/fileName/EveryUpdate.cs: 7a1fd878456a01f1286cf928dbb9fcc0 -> 
+  custom:scripting/monoscript/fileName/TakeUntilCanceled.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/UniTask.Delay.cs: 6d9b8e88c770fd2057f60e63caddbafc -> 
+  custom:scripting/monoscript/fileName/LongCount.cs: c5beda95243fe5b1cf4302db3b15d391 -> 
+  custom:scripting/monoscript/fileName/EnumerableAsyncExtensions.cs: 13e96b5b3a6944983287efb42fd700a4 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:scripting/monoscript/fileName/Last.cs: 88708c3ba65d76354276d15f03452c76 -> 
+  custom:scripting/monoscript/fileName/Cast.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/UniTask.Threading.cs: ab2a0015a9ca3985d1056c9f4f29a2c9 -> 
+  custom:scripting/monoscript/fileName/MinMax.cs: 15779772b7c929062f3f3df938c5c4a0 -> 
+  custom:scripting/precompiled-assembly-types:UniTask.Linq: 2fd36f75ae3c18959dc5ab967f941fcc -> 
+  custom:scripting/monoscript/fileName/TaskPool.cs: a735ffbec628488b88249b7f956b0d0d -> 
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.AssetBundleRequestAllAssets.cs: f3f5c3d001575b5a5576a100282c864a -> 
+  custom:scripting/monoscript/fileName/ValueStopwatch.cs: f61cb305aa85cbbb5acf992243f95334 -> 
+  custom:scripting/monoscript/fileName/WeakDictionary.cs: 0cdf409b5aa8d4c25876d72b5c6a3b60 -> 
+  custom:scripting/monoscript/fileName/Union.cs: 5e129a52608008db261a7267b9274d7e -> 
+  custom:scripting/monoscript/fileName/UniTaskCompletionSource.cs: 7b56bd5ecdcb6239952a48a7b7e3faa2 -> 
+  custom:video-codec-MediaFoundation-h265: 746d11721c4dcdbdad8f713fa42b33f4 -> 
+  custom:scripting/monoscript/fileName/ArrayPool.cs: 845536f7047de828bbec8d41393a75eb -> b62e0c23bd2ab197e5146f9826836769
+  custom:scripting/monoscript/fileName/CombineLatest.cs: b99e6458fba1728c40874a134dc2a0d3 -> 
+  custom:scripting/monoscript/fileName/ToArray.cs: 6404b77bd3066b1944bb51dd4d45afd5 -> 
+  custom:scripting/monoscript/fileName/ForEach.cs: e33c7194e474df42f967f4fe9c0322f1 -> d55750bc6f692ea6e7c7976cd15cc261
+  custom:scripting/monoscript/fileName/CancellationTokenSourceExtensions.cs: df5e67afb4787c78748f0893349ddcc4 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:scripting/monoscript/fileName/AsyncUniTaskMethodBuilder.cs: e3a01de5eb11c9f5866f89eeb20267a0 -> 
+  custom:scripting/monoscript/fileName/AwaitableAnimatorState.cs: bbf76bd3c44c14d26ed3ab47dd9ecf83 -> 
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:scripting/monoscript/fileName/AsyncUniTaskVoidMethodBuilder.cs: 8fa3a82ba985e8b594664166603ffbef -> 
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.cs: 5c801e2a4661c50f2c93ff7347b280fe -> 
+  custom:scripting/monoscript/fileName/Any.cs: aa13258fd7488f44ba8c2c11f3aa46fd -> 
+  custom:scripting/monoscript/fileName/UnityEqualityComparer.cs: 95d9fb995103f23f6d416d53ad31cb26 -> 
+  custom:scripting/monoscript/fileName/Except.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Concat.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/ArrayUtil.cs: f5f8b1bd605a860b79dc6988b57d3023 -> 
+  custom:scripting/monoscript/fileName/AsyncLazy.cs: 25e20805e192ee0d16d280c4f2870a3d -> 
+  custom:scripting/monoscript/fileName/DistinctUntilChanged.cs: 59d9183b470ee61d6699066a5d33f198 -> 
+  custom:scripting/monoscript/fileName/AsyncReactiveProperty.cs: d89c031268f2cb66670e79d131fea850 -> 
+  custom:scripting/monoscript/fileName/ToObservable.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/UniTaskVoid.cs: 4b8f4a8c73a4292efbb21c7d63291fb7 -> 
+  custom:scripting/monoscript/fileName/TextMeshProAsyncExtensions.InputField.cs: df5094f7b04c1c8408903779c58605e6 -> 
+  custom:scripting/monoscript/fileName/UniTask.WhenAny.Generated.cs: 7fb018e9ba3599b49ae82f13957c218e -> 
+  custom:scripting/monoscript/fileName/Average.cs: e8cbae61c3193605078b4ae7fdc4d039 -> 90647cc400823b41df847a6cbfc29026
+  custom:scripting/monoscript/fileName/EnumeratorAsyncExtensions.cs: c0a3605d88ea8ffc810d2a3d675cbb83 -> 
+  custom:scripting/monoscript/fileName/First.cs: 285dac58238b7275ed2bdd847a0195a9 -> 
+  custom:scripting/monoscript/fileName/UnityWebRequestExtensions.cs: f43c4a2feb2af21d14345667745e03fc -> 
+  custom:scripting/monoscript/fileName/PlayerLoopHelper.cs: c0625a0db52c313b6984a1c44898db95 -> 
+  custom:CustomObjectIndexerAttribute: 9a22284fe3817be447336de3de66b15e -> 
+  custom:scripting/monoscript/fileName/ToList.cs: 6e96e24dcf5b767462a5bd4322507504 -> 
+  custom:scripting/monoscript/fileName/Channel.cs: 9e35ae4ba835422461e7181304965bc2 -> 
+  custom:scripting/monoscript/fileName/TakeLast.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Subscribe.cs: 68fe690e175d1806b8f4f9a03484f851 -> 
+  custom:scripting/monoscript/fileName/UniTask.WhenAny.cs: 3c3b2a413e58db97394631ba904ce3bd -> 
+  custom:scripting/monoscript/fileName/Repeat.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:scripting/monoscript/fileName/ExceptionExtensions.cs: 7b81db5ecb9297bf18a2cb3010374468 -> 
+  custom:scripting/monoscript/fileName/ToHashSet.cs: 82703834989a0f61ccf0da63a58b3426 -> 
+  custom:scripting/monoscript/fileName/Take.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/ToUniTaskAsyncEnumerable.cs: 59d9183b470ee61d6699066a5d33f198 -> 
+  custom:scripting/monoscript/fileName/MoveNextSource.cs: fcc01f7a99c9c0ae30680a9b3d13f934 -> 
+  custom:scripting/monoscript/fileName/Empty.cs: 5f5a8429128f0d2431472f9a3949bda4 -> 90647cc400823b41df847a6cbfc29026
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.AsyncInstantiate.cs: c3ae75bda3d40075a0dcb8154a055ddf -> 
+  custom:scripting/monoscript/fileName/UniTaskTrackerTreeView.cs: c3de97b12f71803b2fc26b75b90806df -> 
+  custom:scripting/monoscript/fileName/Create.cs: 289f5930a1bbfbf6d8aac98cd21fd44c -> 
+  custom:scripting/monoscript/fileName/UniTask.Run.cs: e8dfc77fd5da4380c8f8d4365bbf9943 -> 
+  custom:scripting/monoscript/fileName/TimeoutController.cs: 7f14c5a7393aaf241bcae6a62f25f08d -> 
+  custom:scripting/monoscript/fileName/Progress.cs: 0f035c0a290dd1e7182edac9075582e1 -> 
+  custom:scripting/monoscript/fileName/PlayerLoopRunner.cs: a4704c8d47a60a62e6d27742265ebf85 -> 
+  custom:scripting/monoscript/fileName/EveryValueChanged.cs: 289f5930a1bbfbf6d8aac98cd21fd44c -> 
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.AsyncGPUReadback.cs: 2ce912dfbd7921b810c8260119dfd16b -> 
+  custom:scripting/monoscript/fileName/ArrayPoolUtil.cs: 6026c6766773a67edba6918a72666272 -> 
+  custom:scripting/monoscript/fileName/AsyncTriggerBase.cs: 823bd056d86e0ab97aaf6e278b55361e -> 
+  custom:scripting/monoscript/fileName/StatePool.cs: 3b05b2c1e4ab709c481b00592572c470 -> 
+  custom:scripting/monoscript/fileName/TakeUntil.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:scripting/monoscript/fileName/SkipUntil.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/AppendPrepend.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:scripting/monoscript/fileName/DefaultIfEmpty.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Where.cs: e04e425c777f1d7037dc6cc52ad13ed2 -> 
+  custom:scripting/monoscript/fileName/GroupBy.cs: e04e425c777f1d7037dc6cc52ad13ed2 -> 
+  custom:scripting/monoscript/fileName/AsyncAwakeTrigger.cs: 7387ce7788cf5d3792a98688cd3d79f1 -> 
+  custom:scripting/monoscript/fileName/AsyncUnit.cs: bdde3a019349397c42451c1bef7aa1d9 -> 
+  custom:scripting/monoscript/fileName/UniTaskTrackerWindow.cs: ba58a82852775cec7bef8668a6c5b928 -> 
+  custom:scripting/monoscript/fileName/Never.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/precompiled-assembly-types:UniTask.DOTween: bae848875a35fe96f09fcc9f4e534600 -> 
+  custom:SearchIndexIgnoredProperties: e643bd26f0fe6173181afceb89e7c659 -> 
+  custom:scripting/precompiled-assembly-types:UniTask.TextMeshPro: 1240fff2419e6a0667cd64d2c3e0cce6 -> 
+  custom:scripting/monoscript/fileName/IUniTaskSource.cs: 7910628b1cd57745164d0cf383ec2b76 -> 
+  custom:AudioImporter_EditorPlatform: d09bf68614088b80899f8185d706f6e7 -> 
+  custom:scripting/monoscript/fileName/UniTaskObservableExtensions.cs: 1548afc0620b7bb5b9e401bac3b99486 -> 
+  custom:scripting/monoscript/fileName/Select.cs: e04e425c777f1d7037dc6cc52ad13ed2 -> 
+  custom:scripting/monoscript/fileName/Merge.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Pairwise.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Single.cs: a252708f77e204aad6236a91150bdf63 -> 
+  custom:scripting/monoscript/fileName/AsyncMethodBuilderAttribute.cs: 2b2502278de608a17a5db0f4b21b6176 -> 
+  custom:scripting/monoscript/fileName/ContinuationQueue.cs: d500f47c3cf86179cc134f6b5e74e57f -> 
+  custom:scripting/monoscript/fileName/StateMachineRunner.cs: c184195a64aa5df035ee040440bdd14e -> 
+  custom:scripting/monoscript/fileName/UniTask.WaitUntil.cs: be10044e6e00770f1e7dd479f956bf72 -> 
+  custom:scripting/monoscript/fileName/Join.cs: f025ee3af7e7614ce68983d93a5a1fc7 -> 
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.Jobs.cs: 2ce912dfbd7921b810c8260119dfd16b -> 
+  custom:scripting/monoscript/fileName/Reverse.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/OrderBy.cs: ee7b477c1de2821deb7c6c33d7046e0a -> 
+  custom:scripting/monoscript/fileName/AnimationStateMachine.cs: bbf76bd3c44c14d26ed3ab47dd9ecf83 -> 
+  custom:scripting/monoscript/fileName/AsyncDestroyTrigger.cs: e2cbc45ea2f3fb042fac0ae86e248d7e -> 
+  custom:scripting/monoscript/fileName/ElementAt.cs: 699358b9d556e19cd63451f2d736ffd3 -> 
+  custom:scripting/monoscript/fileName/All.cs: b967a2dc5b771a6b4b2ad03d459e6c8c -> 
+  custom:scripting/monoscript/fileName/Sum.cs: 030ce689a2b4d409f68e39ab6d70406e -> 90647cc400823b41df847a6cbfc29026
+  custom:scripting/monoscript/fileName/UniTaskExtensions.cs: 637f60772bce5be0cd05af5b5fec7d0f -> 
+  custom:scripting/monoscript/fileName/Min.cs: b47f728034956cf961e3a064efc31009 -> 
+  custom:scripting/monoscript/fileName/Queue.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/MonoBehaviourMessagesTriggers.cs: 212e6681df016de938f1eb0239d01064 -> 
+  custom:scripting/monoscript/fileName/AsyncTriggerExtensions.cs: b238ddb1a6a4b2ed2cbfe83040c51bc9 -> 
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.MonoBehaviour.cs: 47a331d5c7d0e0d6022ab4f24fc8d2b4 -> 
+  custom:scripting/monoscript/fileName/SkipUntilCanceled.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Skip.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/UniTask.Factory.cs: 3595d39a90d2528e07d49cd823dcc576 -> 
+  custom:scripting/monoscript/fileName/Max.cs: 030a883ed5117a71e7d1dcdcce8c1ab5 -> 
+  custom:scripting/monoscript/fileName/SkipWhile.cs: e04e425c777f1d7037dc6cc52ad13ed2 -> 
+  custom:scripting/monoscript/fileName/UniTask.WhenAll.cs: 525b9593c105e0630336f02398910f9c -> 
+  custom:scripting/monoscript/fileName/AsUniTaskAsyncEnumerable.cs: 5e129a52608008db261a7267b9274d7e -> 
+  custom:scripting/monoscript/fileName/UniTaskExtensions.Shorthand.cs: 8c32dc49bb8d50f9d57a1082f7641549 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:scripting/monoscript/fileName/UniTaskScheduler.cs: 87f424a3d3e9c842b839b0cd7e4069ea -> 
+  custom:scripting/monoscript/fileName/UniTask.cs: e99f3196465a6a0a9c3b71ca0821c65e -> 
+  custom:scripting/monoscript/fileName/PooledDelegate.cs: 90647cc400823b41df847a6cbfc29026 -> 
+  custom:scripting/monoscript/fileName/Count.cs: 0249b2fa5e4baa3102a3afa6b55c47cd -> 
+  custom:scripting/monoscript/fileName/SequenceEqual.cs: 668eee5aea89407486d7bcffe7cb59c3 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:scripting/monoscript/fileName/UniTask.AsValueTask.cs: 8382b6dccbc18fcad34b12d84b00637a -> 
+  custom:scripting/monoscript/fileName/CancellationTokenExtensions.cs: fb13ca76b2a4bfdd4035c0d02dd74fe1 -> 
+  custom:scripting/monoscript/fileName/Intersect.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Zip.cs: f025ee3af7e7614ce68983d93a5a1fc7 -> 
+  custom:scripting/monoscript/fileName/Do.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/precompiled-assembly-types:UniTask.Addressables: bae848875a35fe96f09fcc9f4e534600 -> 
+  custom:scripting/monoscript/fileName/ToLookup.cs: f7d69a007f724bfdcd88082681966f04 -> 
+  custom:scripting/monoscript/fileName/CancellationTokenEqualityComparer.cs: eaf9fb82fea733363e2e5cf9fa66bdd3 -> 
+  custom:scripting/monoscript/fileName/Error.cs: ab4a8d7d73082f9915cfa6955283b9d0 -> 
+  custom:scripting/monoscript/fileName/AsyncStartTrigger.cs: 0066b18d64dbcb5a4f024f7a34f0aaa2 -> 
+  custom:scripting/monoscript/fileName/AsyncEnumeratorBase.cs: 0cdf409b5aa8d4c25876d72b5c6a3b60 -> 
+  custom:scripting/monoscript/fileName/Distinct.cs: 59d9183b470ee61d6699066a5d33f198 -> 
+  custom:scripting/monoscript/fileName/SplitterGUILayout.cs: 42f2560b44aec882ad14954e95bb1cd3 -> 
+  custom:scripting/precompiled-assembly-types:UniTask.Editor: aabeb62855017aa98cc2507d3f607b83 -> 
+  custom:scripting/monoscript/fileName/SelectMany.cs: f025ee3af7e7614ce68983d93a5a1fc7 -> 
+  custom:scripting/monoscript/fileName/SkipLast.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/precompiled-assembly-types:UniTask: 20fac87ff1808a4ffb663124b50c3b36 -> 
+  custom:scripting/monoscript/fileName/UnityBindingExtensions.cs: c98ecbc0d584967b02b08b1ffb2e5224 -> 
+  custom:scripting/monoscript/fileName/TakeWhile.cs: e04e425c777f1d7037dc6cc52ad13ed2 -> 
+  custom:scripting/monoscript/fileName/GroupJoin.cs: f025ee3af7e7614ce68983d93a5a1fc7 -> 
+  custom:scripting/monoscript/fileName/IUniTaskAsyncEnumerable.cs: 8bcbab8bb3b14bda436d4b81b26b1112 -> 
+  custom:scripting/monoscript/fileName/UniTask.WhenEach.cs: 3c3b2a413e58db97394631ba904ce3bd -> 
+  custom:scripting/monoscript/fileName/Publish.cs: 265efb974607a5e184d90b917124cff4 -> 
+  custom:scripting/monoscript/fileName/Return.cs: efe6b934e9d0ee1725c154fd964b4209 -> 
+  custom:scripting/monoscript/fileName/Timer.cs: a857f2fcc999e938d00baea397d40274 -> 2a2c41e1305ce1487e3429cff82a958a
+  custom:scripting/monoscript/fileName/UniTask.WhenAll.Generated.cs: 7fb018e9ba3599b49ae82f13957c218e -> 
+  custom:scripting/monoscript/fileName/TriggerEvent.cs: 0cdf409b5aa8d4c25876d72b5c6a3b60 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:scripting/monoscript/fileName/UniTaskSynchronizationContext.cs: aa8f1eaa9c276ac1a7e880ab468d0807 -> 
+  custom:scripting/monoscript/fileName/Throw.cs: a30ac8f909682390d3fae10f3235e0a7 -> 8c2101cda47f1a6b55b2c6698df42836
+  custom:scripting/monoscript/fileName/Range.cs: 46c6b6ce55d7feba6a28caa4a6c8c25a -> 6403016406936a29c1e23f7a5897e397
+  custom:scripting/monoscript/fileName/UnityAsyncExtensions.uGUI.cs: fe5c6f255cdf251b0b664c4cda7e8cec -> 
+  custom:scripting/monoscript/fileName/UniTask.Bridge.cs: e8dfc77fd5da4380c8f8d4365bbf9943 -> 
+  custom:scripting/monoscript/fileName/Aggregate.cs: a447398e1c44091c47820522200d179d -> 
+  custom:scripting/monoscript/fileName/PlayerLoopTimer.cs: aa4dfcce354a043ef3af68220025f40e -> 
+  custom:scripting/monoscript/fileName/Contains.cs: 6e01b0a49a26aaf8ac394516b8ccc241 -> 
+  custom:scripting/monoscript/fileName/MinimumQueue.cs: 90647cc400823b41df847a6cbfc29026 -> 
+  custom:scripting/monoscript/fileName/DiagnosticsExtensions.cs: 08bd7c3ac86ab08973eade60a63f0e1f -> 
+  custom:scripting/precompiled-assembly-types:Assembly-CSharp: 826e0ee7656bc248366af86658a4cd10 -> 96cf7d2c61f3c522374228465e30b87d
+  custom:scripting/monoscript/fileName/RuntimeHelpersAbstraction.cs: 1681ecbd61e0a0d48e7ef5d8b9f4e3c7 -> 
+  custom:scripting/monoscript/fileName/TextMeshProAsyncExtensions.cs: df5094f7b04c1c8408903779c58605e6 -> 
+  custom:scripting/monoscript/fileName/UnityWebRequestException.cs: 2f89594a450491fa97181818dc809735 -> 
+  custom:scripting/monoscript/fileName/Buffer.cs: 289f5930a1bbfbf6d8aac98cd21fd44c -> 
+  custom:scripting/precompiled-assembly-types:Assembly-CSharp-Editor:  -> 0ab3baead673a6c47fc08ace350d1536
+========================================================================
+Received Prepare
+Caller must complete domain reload
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.355 seconds
+Native extension for WindowsStandalone target not found
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.826 seconds
+Domain Reload Profiling: 1179ms
+	BeginReloadAssembly (126ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (4ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (25ms)
+	RebuildCommonClasses (26ms)
+	RebuildNativeTypeToScriptingClass (8ms)
+	initialDomainReloadingComplete (25ms)
+	LoadAllAssembliesAndSetupDomain (169ms)
+		LoadAssemblies (223ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (14ms)
+			TypeCache.Refresh (5ms)
+				TypeCache.ScanAssembly (0ms)
+			ScanForSourceGeneratedMonoScriptInfo (0ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (826ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (432ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (6ms)
+			SetLoadedEditorAssemblies (3ms)
+			RefreshPlugins (0ms)
+			BeforeProcessingInitializeOnLoad (60ms)
+			ProcessInitializeOnLoadAttributes (330ms)
+			ProcessInitializeOnLoadMethodAttributes (28ms)
+			AfterProcessingInitializeOnLoad (5ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+Callback registration failed. Increase kMaxCallback.
+Fatal Error! Callback registration failed. Increase kMaxCallback.
+Crash!!!
+SymInit: Symbol-SearchPath: 'C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/Mono;.;C:\Users\arcsa\OneDrive\Documents\unity\PECO2;C:\Users\arcsa\OneDrive\Documents\unity\PECO2\Library\BurstCache\JIT;C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor;C:\WINDOWS;C:\WINDOWS\system32;', symOptions: 534, UserName: 'arcsa'
+OS-Version: 10.0.0
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\Unity.exe:Unity.exe (00007FF7FA670000), size: 82522112 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2022.3.59.1816
+C:\WINDOWS\SYSTEM32\ntdll.dll:ntdll.dll (00007FFF57F40000), size: 2502656 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\KERNEL32.DLL:KERNEL32.DLL (00007FFF56D30000), size: 815104 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\KERNELBASE.dll:KERNELBASE.dll (00007FFF554D0000), size: 3969024 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3470
+C:\WINDOWS\System32\CRYPT32.dll:CRYPT32.dll (00007FFF55140000), size: 1536000 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\ucrtbase.dll:ucrtbase.dll (00007FFF552C0000), size: 1359872 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\System32\USER32.dll:USER32.dll (00007FFF56AB0000), size: 1875968 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\win32u.dll:win32u.dll (00007FFF554A0000), size: 159744 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3470
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\s3tcompress.dll:s3tcompress.dll (00007FFF19240000), size: 180224 (result: 0), SymType: '-deferred-', PDB: ''
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\etccompress.dll:etccompress.dll (00007FFEECD90000), size: 5070848 (result: 0), SymType: '-deferred-', PDB: ''
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\libfbxsdk.dll:libfbxsdk.dll (00007FFEEDFF0000), size: 8019968 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2020.3.7.0
+C:\WINDOWS\System32\GDI32.dll:GDI32.dll (00007FFF57970000), size: 172032 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2033
+C:\WINDOWS\System32\ADVAPI32.dll:ADVAPI32.dll (00007FFF579A0000), size: 729088 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\msvcrt.dll:msvcrt.dll (00007FFF56250000), size: 692224 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 7.0.26100.1882
+C:\WINDOWS\System32\gdi32full.dll:gdi32full.dll (00007FFF55B60000), size: 1249280 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\compress_bc7e.dll:compress_bc7e.dll (00007FFEEDCD0000), size: 1433600 (result: 0), SymType: '-deferred-', PDB: ''
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\ispc_texcomp.dll:ispc_texcomp.dll (00007FFEEDE30000), size: 1826816 (result: 0), SymType: '-deferred-', PDB: ''
+C:\WINDOWS\System32\sechost.dll:sechost.dll (00007FFF56F60000), size: 679936 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\System32\msvcp_win.dll:msvcp_win.dll (00007FFF55AB0000), size: 667648 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1882
+C:\WINDOWS\System32\RPCRT4.dll:RPCRT4.dll (00007FFF571A0000), size: 1138688 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\FreeImage.dll:FreeImage.dll (0000000180000000), size: 5783552 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 3.18.0.0
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\WinPixEventRuntime.dll:WinPixEventRuntime.dll (00007FFF35A80000), size: 45056 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 1.0.1812.6001
+C:\WINDOWS\System32\WS2_32.dll:WS2_32.dll (00007FFF56300000), size: 475136 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1882
+C:\WINDOWS\System32\SHELL32.dll:SHELL32.dll (00007FFF56380000), size: 7426048 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\umbraoptimizer64.dll:umbraoptimizer64.dll (00007FFEF6300000), size: 1187840 (result: 0), SymType: '-deferred-', PDB: ''
+C:\WINDOWS\System32\wintypes.dll:wintypes.dll (00007FFF55940000), size: 1474560 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\System32\combase.dll:combase.dll (00007FFF57A80000), size: 3678208 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\VCRUNTIME140.dll:VCRUNTIME140.dll (00007FFF3C4F0000), size: 122880 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 14.42.34433.0
+C:\WINDOWS\SYSTEM32\MSVCP140.dll:MSVCP140.dll (00007FFF3AD40000), size: 577536 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 14.42.34433.0
+C:\WINDOWS\System32\SHLWAPI.dll:SHLWAPI.dll (00007FFF561F0000), size: 380928 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\SYSTEM32\VCRUNTIME140_1.dll:VCRUNTIME140_1.dll (00007FFF3C4C0000), size: 49152 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 14.42.34433.0
+C:\WINDOWS\System32\ole32.dll:ole32.dll (00007FFF572C0000), size: 1658880 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\IMM32.dll:IMM32.dll (00007FFF57460000), size: 192512 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\System32\SETUPAPI.dll:SETUPAPI.dll (00007FFF55D60000), size: 4743168 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\OPENGL32.dll:OPENGL32.dll (00007FFEF9430000), size: 1097728 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\GLU32.dll:GLU32.dll (00007FFEFD380000), size: 184320 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\System32\OLEAUT32.dll:OLEAUT32.dll (00007FFF57E20000), size: 876544 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\WINTRUST.dll:WINTRUST.dll (00007FFF55410000), size: 520192 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\IPHLPAPI.DLL:IPHLPAPI.DLL (00007FFF53940000), size: 208896 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\WINHTTP.dll:WINHTTP.dll (00007FFF4E880000), size: 1171456 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\WINMM.dll:WINMM.dll (00007FFF46B30000), size: 221184 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\bcrypt.dll:bcrypt.dll (00007FFF54A70000), size: 155648 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\SYSTEM32\HID.DLL:HID.DLL (00007FFF53650000), size: 61440 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\SYSTEM32\dwmapi.dll:dwmapi.dll (00007FFF52780000), size: 217088 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\SketchUpAPI.dll:SketchUpAPI.dll (00007FFEED430000), size: 8990720 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 23.0.0.0
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\NativeProxyHelper.dll:NativeProxyHelper.dll (00007FFEED270000), size: 1789952 (result: 0), SymType: '-deferred-', PDB: ''
+C:\WINDOWS\SYSTEM32\VERSION.dll:VERSION.dll (00007FFF4D700000), size: 45056 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\SYSTEM32\WSOCK32.dll:WSOCK32.dll (00007FFF35390000), size: 40960 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1
+C:\WINDOWS\SYSTEM32\dxcore.dll:dxcore.dll (00007FFF52550000), size: 290816 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\SketchUpCommonPreferences.dll:SketchUpCommonPreferences.dll (00007FFEFA350000), size: 499712 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 23.0.0.0
+C:\WINDOWS\SYSTEM32\Secur32.dll:Secur32.dll (00007FFF521A0000), size: 53248 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1
+C:\WINDOWS\SYSTEM32\SSPICLI.DLL:SSPICLI.DLL (00007FFF542F0000), size: 294912 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\OpenRL.dll:OpenRL.dll (000001E06D5D0000), size: 12779520 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 1.5.0.2907
+C:\WINDOWS\SYSTEM32\MSVCP100.dll:MSVCP100.dll (0000000075480000), size: 622592 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.40219.325
+C:\WINDOWS\SYSTEM32\MSVCR100.dll:MSVCR100.dll (0000000074600000), size: 860160 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.40219.325
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\embree.dll:embree.dll (00007FFEEBDA0000), size: 16711680 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2.14.0.0
+C:\WINDOWS\SYSTEM32\cfgmgr32.DLL:cfgmgr32.DLL (00007FFF54DD0000), size: 389120 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\tbb.dll:tbb.dll (00007FFEFA2E0000), size: 413696 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2017.0.2016.1004
+C:\WINDOWS\SYSTEM32\MSWSOCK.DLL:MSWSOCK.DLL (00007FFF54570000), size: 434176 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3194
+C:\WINDOWS\SYSTEM32\MSVCP120.dll:MSVCP120.dll (00007FFEEF0B0000), size: 679936 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 12.0.21005.1
+C:\WINDOWS\SYSTEM32\MSVCR120.dll:MSVCR120.dll (00007FFEEBCB0000), size: 978944 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 12.0.21005.1
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\OpenRL_pthread.dll:OpenRL_pthread.dll (000001E06E220000), size: 61440 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2.9.0.0
+C:\WINDOWS\SYSTEM32\MSASN1.dll:MSASN1.dll (00007FFF548A0000), size: 77824 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2894
+C:\WINDOWS\System32\bcryptprimitives.dll:bcryptprimitives.dll (00007FFF558A0000), size: 626688 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\SYSTEM32\kernel.appcore.dll:kernel.appcore.dll (00007FFF54040000), size: 106496 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1591
+C:\WINDOWS\system32\uxtheme.dll:uxtheme.dll (00007FFF52350000), size: 712704 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\windows.storage.dll:windows.storage.dll (00007FFF52E00000), size: 8671232 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3470
+C:\WINDOWS\System32\SHCORE.dll:SHCORE.dll (00007FFF576A0000), size: 962560 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3470
+C:\WINDOWS\SYSTEM32\profapi.dll:profapi.dll (00007FFF55050000), size: 192512 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\system32\IconCodecService.dll:IconCodecService.dll (00007FFF4E540000), size: 45056 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1
+C:\WINDOWS\SYSTEM32\WindowsCodecs.dll:WindowsCodecs.dll (00007FFF50880000), size: 2285568 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\clbcatq.dll:clbcatq.dll (00007FFF56C80000), size: 688128 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 2001.12.10941.16384
+C:\WINDOWS\System32\netprofm.dll:netprofm.dll (00007FFF50120000), size: 413696 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2454
+C:\WINDOWS\System32\npmproxy.dll:npmproxy.dll (00007FFF4D110000), size: 102400 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\System32\NSI.dll:NSI.dll (00007FFF57010000), size: 40960 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2894
+C:\WINDOWS\SYSTEM32\dhcpcsvc6.DLL:dhcpcsvc6.DLL (00007FFF4E6E0000), size: 126976 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\dhcpcsvc.DLL:dhcpcsvc.DLL (00007FFF4E6B0000), size: 151552 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\DNSAPI.dll:DNSAPI.dll (00007FFF539D0000), size: 1200128 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\system32\napinsp.dll:napinsp.dll (00007FFF370B0000), size: 98304 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\System32\winrnr.dll:winrnr.dll (00007FFF35C30000), size: 73728 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1882
+C:\WINDOWS\system32\nlansp_c.dll:nlansp_c.dll (00007FFF33D50000), size: 139264 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\system32\wshbth.dll:wshbth.dll (00007FFF2B710000), size: 90112 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1882
+C:\WINDOWS\System32\fwpuclnt.dll:fwpuclnt.dll (00007FFF4D9B0000), size: 544768 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\Windows\System32\rasadhlp.dll:rasadhlp.dll (00007FFF4D130000), size: 45056 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\NVUnityPlugin.DLL:NVUnityPlugin.DLL (00007FFEDAF30000), size: 1609728 (result: 0), SymType: '-deferred-', PDB: ''
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\Data\Tools\astcenc-avx2.dll:astcenc-avx2.dll (00007FFEDAEA0000), size: 540672 (result: 0), SymType: '-deferred-', PDB: ''
+C:\WINDOWS\System32\MMDevApi.dll:MMDevApi.dll (00007FFF46230000), size: 630784 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\DEVOBJ.dll:DEVOBJ.dll (00007FFF54DA0000), size: 184320 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\SYSTEM32\d3d11.dll:d3d11.dll (00007FFF50D50000), size: 2514944 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\dxgi.dll:dxgi.dll (00007FFF52620000), size: 1236992 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\directxdatabasehelper.dll:directxdatabasehelper.dll (00007FFF525C0000), size: 380928 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\DriverStore\FileRepository\nvrf.inf_amd64_edd56ec7aba23026\nvldumdx.dll:nvldumdx.dll (00007FFF4D710000), size: 770048 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 31.0.15.3667
+C:\WINDOWS\SYSTEM32\cryptnet.dll:cryptnet.dll (00007FFF4D6C0000), size: 241664 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\SYSTEM32\drvstore.dll:drvstore.dll (00007FFF4D540000), size: 1552384 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\wldp.dll:wldp.dll (00007FFF54910000), size: 380928 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+C:\WINDOWS\SYSTEM32\cryptbase.dll:cryptbase.dll (00007FFF54850000), size: 49152 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2894
+C:\WINDOWS\System32\imagehlp.dll:imagehlp.dll (00007FFF575A0000), size: 131072 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\SYSTEM32\CRYPTSP.dll:CRYPTSP.dll (00007FFF54830000), size: 114688 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2454
+C:\WINDOWS\system32\rsaenh.dll:rsaenh.dll (00007FFF53FA0000), size: 237568 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\System32\DriverStore\FileRepository\nvrf.inf_amd64_edd56ec7aba23026\nvwgf2umx.dll:nvwgf2umx.dll (00007FFF46BB0000), size: 99467264 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 31.0.15.3667
+C:\WINDOWS\system32\nvspcap64.dll:nvspcap64.dll (00007FFF29FC0000), size: 3162112 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 11.0.2.312
+C:\WINDOWS\SYSTEM32\ntmarta.dll:ntmarta.dll (00007FFF54160000), size: 217088 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\System32\DriverStore\FileRepository\nvrf.inf_amd64_edd56ec7aba23026\Display.NvContainer\MessageBus.dll:MessageBus.dll (00007FFF33FB0000), size: 7565312 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 1.22.2758.1620
+C:\WINDOWS\system32\wbem\wbemprox.dll:wbemprox.dll (00007FFF45340000), size: 73728 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1000
+C:\WINDOWS\SYSTEM32\wbemcomn.dll:wbemcomn.dll (00007FFF42C40000), size: 499712 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\system32\wbem\wbemsvc.dll:wbemsvc.dll (00007FFF3F710000), size: 86016 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1000
+C:\WINDOWS\system32\wbem\fastprox.dll:fastprox.dll (00007FFF3F7A0000), size: 983040 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3323
+C:\WINDOWS\SYSTEM32\amsi.dll:amsi.dll (00007FFF3D770000), size: 118784 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.1150
+C:\WINDOWS\SYSTEM32\USERENV.dll:USERENV.dll (00007FFF54630000), size: 176128 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.2454
+C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.25030.2-0\MpOav.dll:MpOav.dll (00007FFF21130000), size: 634880 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 4.18.25030.2
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\cudart64_90.dll:cudart64_90.dll (00007FFEDAE30000), size: 397312 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 6.14.11.9000
+C:\WINDOWS\SYSTEM32\opencl.dll:opencl.dll (00007FFEDAE10000), size: 98304 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 3.0.6.0
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\radeonrays.dll:radeonrays.dll (00007FFED42F0000), size: 557056 (result: 0), SymType: '-deferred-', PDB: ''
+C:\Program Files\Unity\Hub\Editor\2022.3.59f1\Editor\Data\MonoBleedingEdge\EmbedRuntime\mono-2.0-bdwgc.dll:mono-2.0-bdwgc.dll (00007FFED3890000), size: 10825728 (result: 0), SymType: '-deferred-', PDB: ''
+C:\WINDOWS\SYSTEM32\dbghelp.dll:dbghelp.dll (00007FFF40BA0000), size: 2363392 (result: 0), SymType: '-deferred-', PDB: '', fileVersion: 10.0.26100.3037
+
+========== OUTPUTTING STACK TRACE ==================
+
+0x00007FFF5559AB6A (KERNELBASE) RaiseException
+0x00007FF7FC254360 (Unity) EditorMonoConsole::LogToConsoleImplementation
+0x00007FF7FC254DDD (Unity) EditorMonoConsole::LogToConsoleImplementation
+0x00007FF7FCF1C34F (Unity) DebugStringToFilePostprocessedStacktrace
+0x00007FF7FCF1BAAA (Unity) DebugStringToFile
+0x00007FF7FC6FBFC9 (Unity) LoadDomainAndUserAssemblies
+0x00007FF7FCBE3C84 (Unity) WorkerDomainReloadV2
+0x00007FF7FCC04EA5 (Unity) <lambda_b37b41f03089e3cb3f55061bbc93253d>::operator()
+0x00007FF7FCC40882 (Unity) asio::detail::completion_handler<core::mutable_function<void __cdecl(void)>,asio::io_context::basic_executor_type<std::allocator<void>,0> >::do_complete
+0x00007FF7FCC2C82E (Unity) asio::detail::win_iocp_io_context::do_one
+0x00007FF7FCC2E494 (Unity) asio::detail::win_iocp_io_context::run
+0x00007FF7FCC3EC2C (Unity) IOService::Run
+0x00007FF7FCC1208F (Unity) AssetImportWorkerClient::Run
+0x00007FF7FCBDD837 (Unity) RunAssetImportWorkerClientV2
+0x00007FF7FCBDD8BB (Unity) RunAssetImporterV2
+0x00007FF7FC3D463E (Unity) Application::InitializeProject
+0x00007FF7FC869BF5 (Unity) WinMain
+0x00007FF7FDC34E1E (Unity) __scrt_common_main_seh
+0x00007FFF56D5E8D7 (KERNEL32) BaseThreadInitThunk
+0x00007FFF57FFBF6C (ntdll) RtlUserThreadStart
+
+========== END OF STACKTRACE ===========
+
+A crash has been intercepted by the crash handler. For call stack and other details, see the latest crash report generated in:
+ * C:/Users/arcsa/AppData/Local/Temp/Unity/Editor/Crashes

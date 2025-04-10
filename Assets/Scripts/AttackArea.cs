@@ -7,7 +7,7 @@ public class AttackArea : MonoBehaviour
     [SerializeField] private int AttackDamage;
     private Collider attackAreaCollider = null;
 
-    // 攻撃したした回数 （後で多段ヒット防止に使う）
+    // 攻撃したした回数　多段ヒット防止用
     int attackCount = 0;
 
     public void Start()
@@ -19,11 +19,10 @@ public class AttackArea : MonoBehaviour
     public void SetAttackArea()
     {
         attackAreaCollider = this.GetComponent<Collider>();
-        // 初期化時点では無効にしておく
         attackAreaCollider.enabled = false;
     }
 
-    // アニメーションイベントのStartAttackHitを受け取ってコライダを有効にする
+    // 攻撃モーション時に受け取ってコライダを有効にする
     public void StartAttackHit()
     {
         attackCount++;

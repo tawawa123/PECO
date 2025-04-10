@@ -43,13 +43,11 @@ namespace StateManager
         private PlayerStatus playerStatus;
         private AwaitableAnimatorState animationState;
         private Rigidbody rb;
-        private Animator animator;
         private PlayerLockon playerLo;
 
 
         void Start() {
             rb = GetComponent<Rigidbody>();
-            animator = GetComponent<Animator>();
             playerStatus = GetComponent<PlayerStatus>();
             playerLo = GetComponent<PlayerLockon>();
             animationState = GetComponent<AwaitableAnimatorState>();
@@ -364,6 +362,7 @@ namespace StateManager
 
                 // 攻撃アニメーションが終了したらIdleに遷移
                 if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
+                    Owner.AA.EndAttackHit();
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 

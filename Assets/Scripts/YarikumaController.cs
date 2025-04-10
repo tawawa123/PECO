@@ -30,6 +30,7 @@ namespace StateManager
         // 自作メソッドの呼び出し
         private EnemyStatus estatus;
         private AttackArea AA;
+        private AwaitableAnimatorState animationState;
         private StateMachine<YarikumaController> stateMachine;
         private Rigidbody rb; //一緒に入れとく
 
@@ -37,6 +38,7 @@ namespace StateManager
         {
             estatus = this.GetComponent<EnemyStatus>();
             AA = this.GetComponentInChildren<AttackArea>();
+            animationState = GetComponent<AwaitableAnimatorState>();
             rb = GetComponent<Rigidbody>();
 
             stateMachine = new StateMachine<YarikumaController>(this);
@@ -56,9 +58,9 @@ namespace StateManager
         void Update()
         {
             stateMachine.OnUpdate();
-            //Debug.Log(estatus.Hp);
+            if(estatus.Hp <= 0)
+                stateMachine.ChangeState((int) StateType.Death);
         }
-
 
         // Idle状態を定義するメソッド
         // 基本使わないけど、巡回中に立ち止まったりするときにIdleステートに入るかもなので一応定義
@@ -201,7 +203,8 @@ namespace StateManager
                 Debug.Log("追跡中");
                 // navmeshでプレイヤーの座標まで移動する
 
-                // navmeshが目的地に到達したらBattleステートへ移行
+                // プレイヤーとの距離が一定以下になればBattleステートへ移行
+                StateMachine.ChangeState((int) StateType.Battle);
 
                 // エネミーの危険距離外にプレイヤーが抜けたらVigilanceステートへ移行
                 if (Mathf.Abs(posDelta.magnitude) >= Owner.warningDistance)
@@ -225,7 +228,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                
+                StateMachine.ChangeState((int) StateType.Vigilance);
+                Owner.AA.StartAttackHit();
             }
 
             public override void OnEnd()
@@ -245,7 +249,12 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                
+                Owner.AA.StartAttackHit();
+
+                // 攻撃アニメーションが終了したらIdleに遷移
+                // if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
+                //     Owner.AA.EndAttackHit();
+                //     StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
