@@ -23,6 +23,7 @@ namespace StateManager
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
 
+        // StateTypeの定義
         private enum StateType
         {
             Idle,
@@ -52,7 +53,7 @@ namespace StateManager
             playerLo = GetComponent<PlayerLockon>();
             animationState = GetComponent<AwaitableAnimatorState>();
 
-            // ステートの登録
+            // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<PlayerController>(this);
             stateMachine.Add<StateIdle>((int) StateType.Idle);
             stateMachine.Add<StateMove>((int) StateType.Move);

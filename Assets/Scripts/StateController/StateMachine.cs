@@ -4,10 +4,7 @@ using UnityEngine.AI;
 
 namespace StateManager
 {
-    /// <summary>
     /// ステートマシンクラス
-    /// class定義の基底クラス切り出し版
-    /// </summary>
     public class StateMachine<TOwner>
     {
         /// <summary>

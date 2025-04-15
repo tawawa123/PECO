@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace StateManager
 {
@@ -31,15 +32,20 @@ namespace StateManager
         private EnemyStatus estatus;
         private AttackArea AA;
         private AwaitableAnimatorState animationState;
+        private Destination destination;
         private StateMachine<YarikumaController> stateMachine;
         private Rigidbody rb; //一緒に入れとく
+        private NavMeshAgent navAgent;
+        
 
         void Start()
         {
             estatus = this.GetComponent<EnemyStatus>();
             AA = this.GetComponentInChildren<AttackArea>();
             animationState = GetComponent<AwaitableAnimatorState>();
+            destination = GetComponent<Destination>();
             rb = GetComponent<Rigidbody>();
+            navAgent = GetComponent<NavMeshAgent>();
 
             stateMachine = new StateMachine<YarikumaController>(this);
             stateMachine.Add<StateIdle>((int) StateType.Idle);
@@ -98,12 +104,19 @@ namespace StateManager
             {
                 posDelta = Vector3.zero;
                 target_angle = 0;
+                Owner.navAgent.SetDestination(Owner.destination.GetDestination());
+
                 Debug.Log("start Round");
             }
 
             public override void OnUpdate()
             {
                 //navmeshによる巡回処理
+                if(Vector3.Distance(Owner.transform.position, Owner.destination.GetDestination()) < 0.5f)
+                {
+                    Owner.destination.CreateDestination();
+                    Owner.navAgent.SetDestination(Owner.destination.GetDestination());
+                }
 
                 posDelta = Owner.player.transform.position - Owner.transform.position;
                 
@@ -141,11 +154,15 @@ namespace StateManager
         {
             Vector3 posDelta;
             float target_angle;
+            float vigilancePoint;
 
             public override void OnStart()
             {
                 posDelta = Vector3.zero;
                 target_angle = 0;
+                vigilancePoint = 0;
+
+                Owner.navAgent.SetDestination(Owner.transform.position);
                 Debug.Log("start Vigilance");
             }
 
@@ -168,8 +185,8 @@ namespace StateManager
                     {
                         if (hit.collider.gameObject.tag == "Player")
                         {
-                            if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //危険距離内に入ったらチェイス開始
-                                StateMachine.ChangeState((int) StateType.Chase);
+                            VigilancePoint();
+                            // StateMachine.ChangeState((int) StateType.Chase);
                         }
                     }
                 }
@@ -178,6 +195,23 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end Vigilance");
+            }
+
+            private void VigilancePoint()
+            {
+                float MAX = 100;
+                float MIN = 0;
+
+                if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //危険距離内は警戒度100
+                    vigilancePoint = MAX;
+                
+                var inverseProportion = (1 - Mathf.InverseLerp(1, Owner.viewingDistance, Mathf.Abs(posDelta.magnitude)));
+                vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
+                
+                Debug.Log(Mathf.Clamp(vigilancePoint, MIN, MAX));
+                if(Mathf.Clamp(vigilancePoint, MIN, MAX) >= MAX){
+                    StateMachine.ChangeState((int) StateType.Chase);
+                }
             }
         }
 
