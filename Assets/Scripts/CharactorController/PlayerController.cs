@@ -123,7 +123,6 @@ namespace StateManager
             }
             
             float Angle = Vector3.Angle(closest.transform.forward, this.transform.forward);
-            Debug.Log(Mathf.Abs(Angle));
             if(Mathf.Abs(Angle) < 20.0f){
                 backstab = true;
             }
@@ -354,21 +353,21 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                Owner.AA.StartAttackHit();
                 Debug.Log("start attack");
             }
 
             public override void OnUpdate()
             {
-                Owner.AA.StartAttackHit();
-
                 // 攻撃アニメーションが終了したらIdleに遷移
                 if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
-                    Owner.AA.EndAttackHit();
                     StateMachine.ChangeState((int) StateType.Idle);
+
             }
 
             public override void OnEnd()
             {
+                Owner.AA.EndAttackHit();
                 Debug.Log("end attack");
             }
         }

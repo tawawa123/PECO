@@ -3053,7 +3053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 514311783846694740, guid: a8c9a16742cc58041a081e8c0707fcda, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.22
+      value: 2.23
       objectReference: {fileID: 0}
     - target: {fileID: 514311783846694740, guid: a8c9a16742cc58041a081e8c0707fcda, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3138,6 +3138,9 @@ MonoBehaviour:
   destination: {x: 0, y: 0, z: 0}
   targets:
   - {fileID: 1331361202}
+  - {fileID: 187910346}
+  - {fileID: 500373725}
+  - {fileID: 1682067283}
   order: 0
   route: 0
 --- !u!195 &1408721730
@@ -3150,7 +3153,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 1
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -3770,12 +3773,12 @@ SceneRoots:
   - {fileID: 963194228}
   - {fileID: 612583748}
   - {fileID: 991354138}
+  - {fileID: 1844701316}
+  - {fileID: 1803560339}
   - {fileID: 2078939187}
   - {fileID: 705507995}
   - {fileID: 1408721721}
   - {fileID: 148981424}
-  - {fileID: 1844701316}
-  - {fileID: 1803560339}
   - {fileID: 387937435}
   - {fileID: 144265594}
   - {fileID: 1331361202}

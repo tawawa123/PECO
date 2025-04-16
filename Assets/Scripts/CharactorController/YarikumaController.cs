@@ -15,6 +15,7 @@ namespace StateManager
         [SerializeField] private float viewingAngle = 45.0f;
 
         private bool findPlayer = false;
+        private float vigilancePoint = 0;
 
         private enum StateType
         {
@@ -111,6 +112,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.vigilancePoint = Mathf.Clamp((Owner.vigilancePoint - 0.05f), 0f, 100f);
+
                 //navmeshによる巡回処理
                 if(Vector3.Distance(Owner.transform.position, Owner.destination.GetDestination()) < 0.5f)
                 {
@@ -154,13 +157,11 @@ namespace StateManager
         {
             Vector3 posDelta;
             float target_angle;
-            float vigilancePoint;
 
             public override void OnStart()
             {
                 posDelta = Vector3.zero;
                 target_angle = 0;
-                vigilancePoint = 0;
 
                 Owner.navAgent.SetDestination(Owner.transform.position);
                 Debug.Log("start Vigilance");
@@ -185,8 +186,7 @@ namespace StateManager
                     {
                         if (hit.collider.gameObject.tag == "Player")
                         {
-                            VigilancePoint();
-                            // StateMachine.ChangeState((int) StateType.Chase);
+                            PlusVigilancePoint();
                         }
                     }
                 }
@@ -197,19 +197,19 @@ namespace StateManager
                 Debug.Log("end Vigilance");
             }
 
-            private void VigilancePoint()
+            private void PlusVigilancePoint()
             {
                 float MAX = 100;
                 float MIN = 0;
 
-                if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //危険距離内は警戒度100
-                    vigilancePoint = MAX;
+                if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //危険距離内
+                    Owner.vigilancePoint = MAX;
                 
                 var inverseProportion = (1 - Mathf.InverseLerp(1, Owner.viewingDistance, Mathf.Abs(posDelta.magnitude)));
-                vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
+                Owner.vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
                 
-                Debug.Log(Mathf.Clamp(vigilancePoint, MIN, MAX));
-                if(Mathf.Clamp(vigilancePoint, MIN, MAX) >= MAX){
+                // 警戒度100以上でチェイス開始
+                if(Mathf.Clamp(Owner.vigilancePoint, MIN, MAX) >= MAX){
                     StateMachine.ChangeState((int) StateType.Chase);
                 }
             }
@@ -220,29 +220,35 @@ namespace StateManager
         private class StateChase : StateBase
         {
             Vector3 posDelta;
-            float target_angle;
+            //float target_angle;
 
             public override void OnStart()
             {
                 posDelta = Vector3.zero;
-                target_angle = 0;
+                //target_angle = 0;
                 Debug.Log("start Chase");
             }
 
             public override void OnUpdate()
             {
                 posDelta = Owner.player.transform.position - Owner.transform.position;
-                target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
+                //target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
 
                 Debug.Log("追跡中");
                 // navmeshでプレイヤーの座標まで移動する
+                Owner.navAgent.SetDestination(Owner.player.transform.position);
 
                 // プレイヤーとの距離が一定以下になればBattleステートへ移行
-                StateMachine.ChangeState((int) StateType.Battle);
+                if (Mathf.Abs(posDelta.magnitude) <= 5.0f){
+                    Owner.navAgent.ResetPath();
+                    StateMachine.ChangeState((int) StateType.Battle);
+                }
 
-                // エネミーの危険距離外にプレイヤーが抜けたらVigilanceステートへ移行
-                if (Mathf.Abs(posDelta.magnitude) >= Owner.warningDistance)
+                // エネミーの視界外にプレイヤーが抜けたらVigilanceステートへ移行
+                if (Mathf.Abs(posDelta.magnitude) >= Owner.viewingDistance){
+                    Owner.vigilancePoint -= 5.0f;
                     StateMachine.ChangeState((int) StateType.Vigilance);
+                }
             }
 
             public override void OnEnd()
@@ -255,14 +261,21 @@ namespace StateManager
         // 戦闘状態の処理メソッド
         private class StateBattle : StateBase
         {
+            Vector3 posDelta;
+
             public override void OnStart()
             {
+                posDelta = Vector3.zero;
                 Debug.Log("start Battle");
             }
 
             public override void OnUpdate()
             {
-                StateMachine.ChangeState((int) StateType.Vigilance);
+                posDelta = Owner.player.transform.position - Owner.transform.position;
+
+                Debug.Log("戦闘中...");
+                if(Mathf.Abs(posDelta.magnitude) >= 15f)
+                    StateMachine.ChangeState((int) StateType.Vigilance);
                 Owner.AA.StartAttackHit();
             }
 
