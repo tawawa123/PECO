@@ -11,40 +11,28 @@ public class PlayerStatus : MonoBehaviour
 	public int m_hp = 0;
 
 	[SerializeField]
-	public int m_atkDamage = 0;
+	public int m_atk = 0;
 
 	[SerializeField]
-	public int m_atkPower = 0;
+	public float m_energy = 100;
 
 	[SerializeField]
-	public float m_heal = 1;
+	public float m_healEnergyPerSec = 1;
 
 	[SerializeField]
-	public float m_walkSpeed = 0.0f;
-
-	[SerializeField]
-	public float m_runSpeed = 0.0f;
-
-	[SerializeField]
-	public float m_rotationRate = 0.0f;
-
-	[SerializeField]
-	public float m_avoidPower = 0.0f;
-
-	[SerializeField]
-	public float m_stun = 0;
+	public float m_speed = 0.0f;
 
 
 	// ----------------------------------------------
 	// アクセサ
 
-	public int GetHp 					{ get { return m_hp; } }
-	public int GetAtkDamage 			{ get { return m_atkDamage; } }
-	public int GetAtkPower				{ get { return m_atkPower; } }
-	public float GetHeal 				{ get { return m_heal; } }
-	public float GetWalkSpeed			{ get { return m_walkSpeed; } }
-	public float GetRunSpeed 			{ get { return m_runSpeed; } }
-	public float GetRotationRate 		{ get { return m_rotationRate; } }
-	public float GetAvoidPower			{ get { return m_avoidPower; } }
-	public float GetStun 				{ get { return m_stun; } }
+	public int   Hp               { get { return m_hp;               } }
+
+	public int   Atk              { get { return m_atk;              } }
+
+	public float Energy           { get { return m_energy;           } }
+
+	public float HealEnergyPerSec { get { return m_healEnergyPerSec; } }
+
+	public float Speed            { get { return m_speed;            } }
 }

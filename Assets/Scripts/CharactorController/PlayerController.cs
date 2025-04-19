@@ -8,14 +8,18 @@ namespace StateManager
 {
     using StateBase = StateMachine<PlayerController>.StateBase;
 
-    public class PlayerController : MonoBehaviour, Damagable
+    public class PlayerController : MonoBehaviour
     {
-        //プレイヤー移動、回転制御
+        [SerializeField] private float moveSpeed = 3f;
+        [SerializeField] private float RotationRate = 6.0f;
+        [SerializeField] private float avoidPower = 5.0f;
+
+        //移動、回転制御の変数
         private float inputHorizontal;
         private float inputVertical;
         private Vector3 moveForward;
         private Quaternion targetRotation;
-        // カメラ回転制御
+
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
 
@@ -30,17 +34,17 @@ namespace StateManager
             Backstab,
             Stun,
             Attack,
-            Damage,
             GameOver,
         }
 
 
-        private StateMachine<PlayerController> stateMachine; //ステート遷移制御
-        private AttackArea AA; //攻撃判定
-        private PlayerStatus playerStatus; //登録ステータス
-        private AwaitableAnimatorState animationState; //アニメーション遷移制御
-        private PlayerLockon playerLo; //ロックオンカメラ制御
+        // 各メソッドの呼び出し
+        private StateMachine<PlayerController> stateMachine;
+        private AttackArea AA;
+        private PlayerStatus playerStatus;
+        private AwaitableAnimatorState animationState;
         private Rigidbody rb;
+        private PlayerLockon playerLo;
 
 
         void Start() {
@@ -59,7 +63,6 @@ namespace StateManager
             stateMachine.Add<StateBackstab>((int) StateType.Backstab);
             stateMachine.Add<StateStun>((int) StateType.Stun);
             stateMachine.Add<StateAttack>((int) StateType.Attack);
-            stateMachine.Add<StateDamage>((int) StateType.Damage);
             stateMachine.Add<StateGameOver>((int) StateType.GameOver);
 
             stateMachine.OnStart((int) StateType.Idle);
@@ -72,7 +75,7 @@ namespace StateManager
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
 
-            if(playerStatus.GetHp <= 0)
+            if(playerStatus.Hp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
 
             if (moveForward != Vector3.zero)
@@ -162,7 +165,7 @@ namespace StateManager
                     if(Owner.Backstab()){
                         Owner.animationState.SetState("Spinkick");
                         StateMachine.ChangeState((int) StateType.Backstab);
-                    } else{
+                    }else{
                         Owner.animationState.SetState("Jab");
                         StateMachine.ChangeState((int) StateType.Attack);
                     }
@@ -189,10 +192,10 @@ namespace StateManager
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
-                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, Owner.rb.velocity.y, 0);
+                Owner.rb.velocity = Owner.moveForward * Owner.moveSpeed + new Vector3(0, Owner.rb.velocity.y, 0);
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
-                    Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
+                    Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.RotationRate);
                 }
 
                 // Idle
@@ -242,9 +245,9 @@ namespace StateManager
             {
                 if(once){
                     if(Owner.rb.velocity.magnitude >= 0.1f){
-                        Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                        Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
                     } else {
-                        Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                        Owner.rb.AddForce(Owner.transform.forward * Owner.avoidPower, ForceMode.Impulse);
                     }
                     once = false;
                 }
@@ -357,42 +360,15 @@ namespace StateManager
             public override void OnUpdate()
             {
                 // 攻撃アニメーションが終了したらIdleに遷移
-                if(Owner.animationState.AnimtionFinish("Jab") > 1.01f){
-                    Owner.AA.EndAttackHit();
+                if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
-                }
+
             }
 
             public override void OnEnd()
             {
-                //Owner.AA.EndAttackHit();
+                Owner.AA.EndAttackHit();
                 Debug.Log("end attack");
-            }
-        }
-
-
-        // ダメージ処理用インターフェイス
-        public void AddDamage(int damage){
-            // playerStatus.m_hp -= damage;
-            stateMachine.ChangeState((int) StateType.Damage);
-        }
-        // ダメージが発生した時の体力管理やアニメーション再生用のメソッド
-        private class StateDamage : StateBase
-        {
-            public override void OnStart()
-            {
-                Debug.Log("start Damage");
-                Debug.Log(Owner.playerStatus.GetHp);
-            }
-
-            public override void OnUpdate()
-            {
-                StateMachine.ChangeState((int) StateType.Idle);
-            }
-
-            public override void OnEnd()
-            {
-                Debug.Log("end Damage");
             }
         }
 

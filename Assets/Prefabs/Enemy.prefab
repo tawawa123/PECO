@@ -137,13 +137,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_hp: 70
-  m_atkDamage: 5
-  m_atkPower: 1
-  m_speed: 3
-  m_viewRange: 30
-  m_warningRange: 20
-  m_viewAngle: 45
-  m_stun: 0
+  m_atk: 0
+  m_energy: 100
+  m_healEnergyPerSec: 1
+  m_point: 10
+  m_speed: 0
+  m_searchRange: 0
 --- !u!1 &5643845777244621395
 GameObject:
   m_ObjectHideFlags: 0

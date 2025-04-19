@@ -13,11 +13,11 @@ public class PlayerHPManager : MonoBehaviour
     {
         pStatus = this.GetComponent<PlayerStatus>();
         slider.value = 1;
-        maxHP = this.pStatus.GetHp;
+        maxHP = this.pStatus.Hp;
     }
 
     public void Update()
     {
-        slider.value = (float)pStatus.GetHp / (float)maxHP;
+        slider.value = (float)pStatus.Hp / (float)maxHP;
     }
 }
