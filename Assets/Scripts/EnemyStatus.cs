@@ -11,38 +11,36 @@ public class EnemyStatus : MonoBehaviour
 	public int m_hp = 0;
 
 	[SerializeField]
-	public int m_atk = 0;
+	public int m_atkDamage = 0;
 
 	[SerializeField]
-	public float m_energy = 100;
-
-	[SerializeField]
-	public float m_healEnergyPerSec = 1;
-
-	[SerializeField]
-	public int m_point = 10;
+	public int m_atkPower = 0;
 
 	[SerializeField]
 	public float m_speed = 0.0f;
 
 	[SerializeField]
-	public float m_searchRange = 0.0f;
+	public float m_viewRange = 0.0f;
+
+	[SerializeField]
+	public float m_warningRange = 0.0f;
+
+	[SerializeField]
+	public float m_viewAngle = 0.0f;
+
+	[SerializeField]
+	public float m_stun = 0;
 
 
 	// ----------------------------------------------
 	// アクセサ
 
-	public int   Hp               { get { return m_hp;               } }
-
-	public int   Atk              { get { return m_atk;              } }
-
-	public float Energy           { get { return m_energy;           } }
-
-	public float HealEnergyPerSec { get { return m_healEnergyPerSec; } }
-
-	public int   Point            { get { return m_point;            } }
-
-	public float Speed            { get { return m_speed;            } }
-
-	public float SearchRange      { get { return m_searchRange;      } }
+	public int GetHp 				{ get{ return m_hp; } }
+	public int GetAtkDamage 		{ get{ return m_atkDamage; } }
+	public int GetAtkPower 			{ get{ return m_atkPower; } }
+	public float GetSpeed 			{ get{ return m_speed; } }
+	public float GetViewRange 		{ get{ return m_viewRange; } }
+	public float GetWarningRange 	{ get{ return m_warningRange; } }
+	public float GetViewAngle 		{ get{ return m_viewAngle; } }
+	public float GetStun 			{ get{ return m_stun; } }
 }

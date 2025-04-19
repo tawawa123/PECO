@@ -18,7 +18,7 @@ public class AttackArea : MonoBehaviour
     // 武器の付け替えなどのときに、コライダーを再取得する
     public void SetAttackArea()
     {
-        attackAreaCollider = this.GetComponent<Collider>();
+        attackAreaCollider = GetComponent<Collider>();
         attackAreaCollider.enabled = false;
     }
 
@@ -32,25 +32,38 @@ public class AttackArea : MonoBehaviour
     // アニメーションイベントのEndAttackHitを受け取ってコライダを無効にする
     public void EndAttackHit()
     {
-        attackCount--;
+        attackCount = 0;
         attackAreaCollider.enabled = false;
     }
 
     private void OnTriggerEnter (Collider other)
     {
-        switch(LayerMask.LayerToName(other.gameObject.layer))
-        {
-            case "PlayerHit":
-                PlayerStatus pStatus = other.gameObject.GetComponent<PlayerStatus>();
-                pStatus.m_hp -= AttackDamage;
-                break;
+        Debug.Log(attackCount);
+        if(attackCount < 2){
+            switch(LayerMask.LayerToName(other.gameObject.layer))
+            {
+                case "PlayerHit":
+                    PlayerStatus pStatus = other.gameObject.GetComponent<PlayerStatus>();
+                    // pStatus.m_hp -= AttackDamage;
 
-            case "EnemyHit":
-                EnemyStatus eStatus = other.gameObject.GetComponent<EnemyStatus>();
-                eStatus.m_hp -= AttackDamage;
-                break;
+                    var damagetarget1 = other.gameObject.GetComponent<Damagable>();
+                    
+                    if (damagetarget1 != null)
+                        other.gameObject.GetComponent<Damagable>().AddDamage(AttackDamage);
+                    break;
+
+                case "EnemyHit":
+                    EnemyStatus eStatus = other.gameObject.GetComponent<EnemyStatus>();
+                    eStatus.m_hp -= AttackDamage;
+
+                    var damagetarget2 = other.gameObject.GetComponent<Damagable>();
+                    
+                    if (damagetarget2 != null)
+                        other.gameObject.GetComponent<Damagable>().AddDamage(AttackDamage);
+                    break;
+            }
+
+            EndAttackHit();
         }
-
-        EndAttackHit();
     }
 }
