@@ -16,7 +16,7 @@ public class AwaitableAnimatorState : MonoBehaviour
     public const string StateDefault = "Idle";
 
     [SerializeField] private string State = StateDefault;
-    public const float DurationTimeSecond = 0.4f;
+    public float DurationTimeSecond;
 
     private async UniTaskVoid AnimationStateLoop()
     {
@@ -52,9 +52,10 @@ public class AwaitableAnimatorState : MonoBehaviour
         }
     }
 
-    public void SetState(string nextState, bool loop = false, float DurationTimeSecond = 0.4f)
+    public void SetState(string nextState, bool loop = false, float DurationTimeSecond = 0.1f)
     {
         this.loop = loop;
+        this.DurationTimeSecond = DurationTimeSecond;
         if (_animator.HasState(0, Animator.StringToHash(nextState)))
         {
             // 存在するStateだけ受け入れる

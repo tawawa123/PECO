@@ -7,13 +7,9 @@ namespace StateManager
 {
     using StateBase = StateMachine<YarikumaController>.StateBase;
 
-    public class YarikumaController : MonoBehaviour
+    public class YarikumaController : MonoBehaviour, Damagable
     {
         [SerializeField] private GameObject player;
-        [SerializeField] private float warningDistance = 20.0f;
-        [SerializeField] private float viewingDistance = 30.0f;
-        [SerializeField] private float viewingAngle = 45.0f;
-
         private bool findPlayer = false;
         private float vigilancePoint = 0;
 
@@ -29,19 +25,19 @@ namespace StateManager
             Death,
         }
 
-        // 自作メソッドの呼び出し
-        private EnemyStatus estatus;
-        private AttackArea AA;
-        private AwaitableAnimatorState animationState;
-        private Destination destination;
-        private StateMachine<YarikumaController> stateMachine;
-        private Rigidbody rb; //一緒に入れとく
+        // メソッド呼び出し
+        private EnemyStatus enemyStatus; //エネミーの登録ステータス
+        private AttackArea AA; //攻撃判定
+        private AwaitableAnimatorState animationState; //アニメーション遷移管理
+        private Destination destination; //巡回先座標登録
+        private StateMachine<YarikumaController> stateMachine; //ステート遷移管理
+        private Rigidbody rb;
         private NavMeshAgent navAgent;
         
 
         void Start()
         {
-            estatus = this.GetComponent<EnemyStatus>();
+            enemyStatus = this.GetComponent<EnemyStatus>();
             AA = this.GetComponentInChildren<AttackArea>();
             animationState = GetComponent<AwaitableAnimatorState>();
             destination = GetComponent<Destination>();
@@ -59,13 +55,16 @@ namespace StateManager
             stateMachine.Add<StateDeath>((int) StateType.Death);
 
             stateMachine.OnStart((int) StateType.Idle);
+
+            AA = this.GetComponentInChildren<AttackArea>();
+            AA.SetAttackArea();
         }
 
         // Update is called once per frame
         void Update()
         {
             stateMachine.OnUpdate();
-            if(estatus.Hp <= 0)
+            if(enemyStatus.GetHp <= 0)
                 stateMachine.ChangeState((int) StateType.Death);
         }
 
@@ -124,18 +123,18 @@ namespace StateManager
                 posDelta = Owner.player.transform.position - Owner.transform.position;
                 
                 // プレイヤーがエネミーの視界に入っているかの判定
-                if(Mathf.Abs(posDelta.magnitude) <= Owner.viewingDistance)
+                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetViewRange)
                 {
                     target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
 
-                    if (target_angle < Owner.viewingAngle) //target_angleがangleに収まっているかどうか
+                    if (target_angle < Owner.enemyStatus.GetViewAngle) //target_angleがangleに収まっているかどうか
                     {
                         Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
                         if(Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
                         {
                             if (hit.collider.gameObject.tag == "Player")
                             {
-                                if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //視界内の危険距離内に入っていればチェイス開始
+                                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange) //視界内の危険距離内に入っていればチェイス開始
                                     StateMachine.ChangeState((int) StateType.Chase);
                                 else
                                     StateMachine.ChangeState((int) StateType.Vigilance); //視界内なら警戒開始
@@ -143,6 +142,10 @@ namespace StateManager
                         }
                     }
                 }
+
+                // ダメージ処理が起きたらここでストップ
+                if(Owner.vigilancePoint >= 100f)
+                    StateMachine.ChangeState((int) StateType.Battle);
             }
 
             public override void OnEnd()
@@ -173,13 +176,13 @@ namespace StateManager
                 target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
 
                 //エネミーの視界から抜けた時の処理
-                if(Mathf.Abs(posDelta.magnitude) >= Owner.viewingDistance)
+                if(Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange)
                 {
                     // 5秒間くらい処理を回して、なお視界外ならRoundステートに戻る
                     StateMachine.ChangeState((int) StateType.Round);
                 }
 
-                if (target_angle < Owner.viewingAngle) //target_angleがangleに収まっているかどうか
+                if (target_angle < Owner.enemyStatus.GetViewAngle) //target_angleがangleに収まっているかどうか
                 {
                     Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
                     if(Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
@@ -202,10 +205,10 @@ namespace StateManager
                 float MAX = 100;
                 float MIN = 0;
 
-                if(Mathf.Abs(posDelta.magnitude) <= Owner.warningDistance) //危険距離内
+                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange) //危険距離内
                     Owner.vigilancePoint = MAX;
                 
-                var inverseProportion = (1 - Mathf.InverseLerp(1, Owner.viewingDistance, Mathf.Abs(posDelta.magnitude)));
+                var inverseProportion = (1 - Mathf.InverseLerp(1, Owner.enemyStatus.GetViewRange, Mathf.Abs(posDelta.magnitude)));
                 Owner.vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
                 
                 // 警戒度100以上でチェイス開始
@@ -245,7 +248,7 @@ namespace StateManager
                 }
 
                 // エネミーの視界外にプレイヤーが抜けたらVigilanceステートへ移行
-                if (Mathf.Abs(posDelta.magnitude) >= Owner.viewingDistance){
+                if (Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange){
                     Owner.vigilancePoint -= 5.0f;
                     StateMachine.ChangeState((int) StateType.Vigilance);
                 }
@@ -273,7 +276,7 @@ namespace StateManager
             {
                 posDelta = Owner.player.transform.position - Owner.transform.position;
 
-                Debug.Log("戦闘中...");
+                //Debug.Log("戦闘中...");
                 if(Mathf.Abs(posDelta.magnitude) >= 15f)
                     StateMachine.ChangeState((int) StateType.Vigilance);
                 Owner.AA.StartAttackHit();
@@ -299,9 +302,9 @@ namespace StateManager
                 Owner.AA.StartAttackHit();
 
                 // 攻撃アニメーションが終了したらIdleに遷移
-                // if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
-                //     Owner.AA.EndAttackHit();
-                //     StateMachine.ChangeState((int) StateType.Idle);
+                if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
+                    Owner.AA.EndAttackHit();
+                    StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
@@ -311,18 +314,23 @@ namespace StateManager
         }
 
 
+        // ダメージ処理用インターフェイス
+        public void AddDamage(int damage){
+            stateMachine.ChangeState((int) StateType.Damage);
+        }
         // ダメージが発生した時の体力管理やアニメーション再生用のメソッド
         private class StateDamage : StateBase
         {
             public override void OnStart()
             {
                 Debug.Log("start Damage");
-                Debug.Log(Owner.estatus.Hp);
+                Debug.Log(Owner.enemyStatus.GetHp);
+                Owner.vigilancePoint = 100f;
             }
 
             public override void OnUpdate()
             {
-                StateMachine.ChangeState((int) StateType.Idle);
+                StateMachine.ChangeState((int) StateType.Battle);
             }
 
             public override void OnEnd()
