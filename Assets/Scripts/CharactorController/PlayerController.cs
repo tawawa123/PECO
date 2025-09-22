@@ -102,7 +102,7 @@ namespace StateManager
             GameObject[] gos;
             gos = GameObject.FindGameObjectsWithTag("Enemy");
             GameObject closest = null;
-            float distance = Mathf.Infinity;
+            float distance = 10;
 
             foreach (GameObject go in gos)
             {

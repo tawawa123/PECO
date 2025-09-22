@@ -60,6 +60,17 @@ public class PlayerLockon : MonoBehaviour
                     lockonCursor.SetActive(true);
                 }
             }
+
+            // ターゲットが死亡した時ロックオンを外す
+            if(targetObj == null && isLockon)
+            {
+                isLockon = false;
+                lockonCursor.SetActive(false);
+                lockonInput = false;
+                playerCamera.InactiveLockonCamera();
+                targetObj = null;
+                return;
+            }
         }
 
         if (lockonInput)
@@ -164,7 +175,6 @@ public class PlayerLockon : MonoBehaviour
     }
 
     // 2. 1のリスト全てにrayを飛ばし射線が通るものだけをList化
-    // Raycastの発射位置によっては自モデルに当たって遮蔽物扱いされる場合がある
     private List<GameObject> makeListRaycastHit(RaycastHit[] hits)
     {
         List<GameObject> hitObjects = new List<GameObject>();
