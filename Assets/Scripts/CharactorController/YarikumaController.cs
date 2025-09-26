@@ -22,6 +22,7 @@ namespace StateManager
             Battle,
             Attack,
             Damage,
+            Backstabed,
             Death,
         }
 
@@ -52,6 +53,7 @@ namespace StateManager
             stateMachine.Add<StateBattle>((int) StateType.Battle);
             stateMachine.Add<StateAttack>((int) StateType.Attack);
             stateMachine.Add<StateDamage>((int) StateType.Damage);
+            stateMachine.Add<StateBackstabed>((int) StateType.Backstabed);
             stateMachine.Add<StateDeath>((int) StateType.Death);
 
             stateMachine.OnStart((int) StateType.Idle);
@@ -64,8 +66,16 @@ namespace StateManager
         void Update()
         {
             stateMachine.OnUpdate();
-            if(enemyStatus.GetHp <= 0)
+            if(enemyStatus.GetHp <= 0){
+                int layer = LayerMask.NameToLayer("Dead");
+                this.gameObject.layer = layer;
                 stateMachine.ChangeState((int) StateType.Death);
+            }
+
+            if(enemyStatus.GetBackstabed){
+                animationState.SetState("Backstabed", true);
+                stateMachine.ChangeState((int) StateType.Backstabed);
+            }
         }
 
         // Idle状態を定義するメソッド
@@ -80,9 +90,11 @@ namespace StateManager
             public override void OnUpdate()
             {
                 Owner.AA.StartAttackHit();
+                Owner.animationState.SetState("walk", true);
                 StateMachine.ChangeState((int) StateType.Round);
 
                 if (Owner.findPlayer){
+                    Owner.animationState.SetState("Conbat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
@@ -114,7 +126,7 @@ namespace StateManager
                 Owner.vigilancePoint = Mathf.Clamp((Owner.vigilancePoint - 0.05f), 0f, 100f);
 
                 //navmeshによる巡回処理
-                if(Vector3.Distance(Owner.transform.position, Owner.destination.GetDestination()) < 0.5f)
+                if(Vector3.Distance(Owner.transform.position, Owner.destination.GetDestination()) < 1.5f)
                 {
                     Owner.destination.CreateDestination();
                     Owner.navAgent.SetDestination(Owner.destination.GetDestination());
@@ -134,10 +146,16 @@ namespace StateManager
                         {
                             if (hit.collider.gameObject.tag == "Player")
                             {
-                                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange) //視界内の危険距離内に入っていればチェイス開始
+                                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange)
+                                {
+                                    Owner.animationState.SetState("Run", true);
+                                    //視界内の危険距離内に入っていればチェイス開始
                                     StateMachine.ChangeState((int) StateType.Chase);
-                                else
+                                }
+                                else{
+                                    Owner.animationState.SetState("Idle", true);
                                     StateMachine.ChangeState((int) StateType.Vigilance); //視界内なら警戒開始
+                                }
                             }
                         }
                     }
@@ -178,6 +196,7 @@ namespace StateManager
                 //エネミーの視界から抜けた時の処理
                 if(Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange)
                 {
+                    Owner.animationState.SetState("walk", true);
                     // 5秒間くらい処理を回して、なお視界外ならRoundステートに戻る
                     StateMachine.ChangeState((int) StateType.Round);
                 }
@@ -213,6 +232,7 @@ namespace StateManager
                 
                 // 警戒度100以上でチェイス開始
                 if(Mathf.Clamp(Owner.vigilancePoint, MIN, MAX) >= MAX){
+                    Owner.animationState.SetState("Run", true);
                     StateMachine.ChangeState((int) StateType.Chase);
                 }
             }
@@ -229,6 +249,7 @@ namespace StateManager
             {
                 posDelta = Vector3.zero;
                 //target_angle = 0;
+                Owner.navAgent.speed = 4;
                 Debug.Log("start Chase");
             }
 
@@ -244,18 +265,21 @@ namespace StateManager
                 // プレイヤーとの距離が一定以下になればBattleステートへ移行
                 if (Mathf.Abs(posDelta.magnitude) <= 5.0f){
                     Owner.navAgent.ResetPath();
+                    Owner.animationState.SetState("Combat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
 
                 // エネミーの視界外にプレイヤーが抜けたらVigilanceステートへ移行
                 if (Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange){
                     Owner.vigilancePoint -= 5.0f;
+                    Owner.animationState.SetState("Idle", true);
                     StateMachine.ChangeState((int) StateType.Vigilance);
                 }
             }
 
             public override void OnEnd()
             {
+                Owner.navAgent.speed = 2;
                 Debug.Log("end Chase");
             }
         }
@@ -265,10 +289,21 @@ namespace StateManager
         private class StateBattle : StateBase
         {
             Vector3 posDelta;
+            Vector3 destination;
+            float targetAngle;
 
             public override void OnStart()
             {
                 posDelta = Vector3.zero;
+
+                // プレイヤーの周囲を動くための目的地設定
+                Transform p = Owner.player.transform;
+                float centerAngle = Mathf.Atan2(p.forward.z, p.forward.x) * Mathf.Rad2Deg;
+                float randomOffset = Random.Range(-60f, 60f); // ±60°の範囲
+                targetAngle = centerAngle + randomOffset;
+
+                Owner.navAgent.angularSpeed = 0;
+
                 Debug.Log("start Battle");
             }
 
@@ -276,15 +311,40 @@ namespace StateManager
             {
                 posDelta = Owner.player.transform.position - Owner.transform.position;
 
-                //Debug.Log("戦闘中...");
-                if(Mathf.Abs(posDelta.magnitude) >= 15f)
+                if(Mathf.Abs(posDelta.magnitude) >= 15f){
+                    Owner.animationState.SetState("Chase", true);
+                    Owner.navAgent.angularSpeed = 120;
                     StateMachine.ChangeState((int) StateType.Vigilance);
-                Owner.AA.StartAttackHit();
+                }
+
+                Vector3 destination = GetPointOnArc(Owner.player.transform.position, 3.0f, targetAngle);
+                Owner.navAgent.SetDestination(destination);
+
+                if(Mathf.Abs((Owner.transform.position - destination).magnitude) <= 0.5f){
+                    Owner.animationState.SetState("Attack", true);
+                    StateMachine.ChangeState((int) StateType.Attack);
+                }
+
+                // プレイヤーの位置とこの敵の位置から角度を求める。
+                var qrot = Quaternion.LookRotation(Owner.player.transform.position - Owner.transform.position);
+                Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, qrot, Time.time * 2);
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end Battle");
+            }
+
+            // プレイヤーを中心にした円弧上の座標を取得
+            public Vector3 GetPointOnArc(Vector3 playerPos, float radius, float angleDeg)
+            {
+                // 角度をラジアンに変換
+                float rad = angleDeg * Mathf.Deg2Rad;
+                // 水平方向 (XZ平面) のみ
+                float x = playerPos.x + radius * Mathf.Cos(rad);
+                float z = playerPos.z + radius * Mathf.Sin(rad);
+
+                return new Vector3(x, playerPos.y, z);
             }
         }
 
@@ -301,10 +361,12 @@ namespace StateManager
             {
                 Owner.AA.StartAttackHit();
 
-                // 攻撃アニメーションが終了したらIdleに遷移
-                if(Owner.animationState.AnimtionFinish("Jab") >= 1f)
+                // 攻撃アニメーションが終了したらButtleに遷移
+                if(Owner.animationState.AnimtionFinish("Attack") >= 1f){
                     Owner.AA.EndAttackHit();
-                    StateMachine.ChangeState((int) StateType.Idle);
+                    Owner.animationState.SetState("Combat", true);
+                    StateMachine.ChangeState((int) StateType.Battle);
+                }
             }
 
             public override void OnEnd()
@@ -326,16 +388,50 @@ namespace StateManager
                 Debug.Log("start Damage");
                 Debug.Log(Owner.enemyStatus.GetHp);
                 Owner.vigilancePoint = 100f;
+                Owner.animationState.SetState("Damage", true);
             }
 
             public override void OnUpdate()
             {
-                StateMachine.ChangeState((int) StateType.Battle);
+                if(Owner.animationState.AnimtionFinish("Damage") >= 1f){
+                    Owner.animationState.SetState("Combat", true);
+                    StateMachine.ChangeState((int) StateType.Battle);
+                }
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end Damage");
+            }
+        }
+
+
+        private class StateBackstabed : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Backstabed");
+                Debug.Log(Owner.enemyStatus.GetHp);
+
+                Owner.vigilancePoint = 100f;
+                Owner.animationState.SetState("Backstabed", true);
+
+                Owner.navAgent.speed = 0;
+            }
+
+            public override void OnUpdate()
+            {
+                if(Owner.animationState.AnimtionFinish("Backstabed") >= 1f){
+                    Owner.animationState.SetState("Combat", true);
+                    StateMachine.ChangeState((int) StateType.Battle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Owner.enemyStatus.m_backstabed = false;
+                Owner.navAgent.speed = 2;
+                Debug.Log("end Backstabed");
             }
         }
 
@@ -346,12 +442,15 @@ namespace StateManager
             public override void OnStart()
             {
                 Debug.Log("start Death");
+                Owner.animationState.SetState("Death", true);
             }
 
             public override void OnUpdate()
             {
                 Debug.Log("体力が0になりました");
-                Destroy(Owner.gameObject);
+                if(Owner.animationState.AnimtionFinish("Death") >= 1f){
+                    Destroy(Owner.gameObject);
+                }
             }
 
             public override void OnEnd()

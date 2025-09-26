@@ -31,6 +31,9 @@ public class EnemyStatus : MonoBehaviour
 	[SerializeField]
 	public float m_stun = 0;
 
+	[SerializeField]
+	public bool m_backstabed = false;
+
 
 	// ----------------------------------------------
 	// アクセサ
@@ -43,4 +46,5 @@ public class EnemyStatus : MonoBehaviour
 	public float GetWarningRange 	{ get{ return m_warningRange; } }
 	public float GetViewAngle 		{ get{ return m_viewAngle; } }
 	public float GetStun 			{ get{ return m_stun; } }
+	public bool GetBackstabed 		{ get{ return m_backstabed; } }
 }

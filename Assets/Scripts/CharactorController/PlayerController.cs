@@ -122,6 +122,7 @@ namespace StateManager
             float Angle = Vector3.Angle(closest.transform.forward, this.transform.forward);
             if(Mathf.Abs(Angle) < 20.0f){
                 backstab = true;
+                closest.GetComponent<EnemyStatus>().m_backstabed = true;
             }
 
             return backstab;
@@ -160,7 +161,7 @@ namespace StateManager
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
                     if(Owner.Backstab()){
-                        Owner.animationState.SetState("Spinkick");
+                        Owner.animationState.SetState("Backstab");
                         StateMachine.ChangeState((int) StateType.Backstab);
                     } else{
                         Owner.animationState.SetState("Jab");
@@ -210,7 +211,7 @@ namespace StateManager
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
                     if(Owner.Backstab()){
-                        Owner.animationState.SetState("Spinkick");
+                        Owner.animationState.SetState("Backstab");
                         StateMachine.ChangeState((int) StateType.Backstab);
                     } else{
                         Owner.animationState.SetState("Jab");
@@ -306,6 +307,7 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                
                 Debug.Log("start backstab");
             }
 
@@ -313,7 +315,7 @@ namespace StateManager
             {
                 Debug.Log("バクスタ判定が出ました！");
 
-                if(Owner.animationState.AnimtionFinish("Spinkick") >= 1f)
+                if(Owner.animationState.AnimtionFinish("Backstab") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 

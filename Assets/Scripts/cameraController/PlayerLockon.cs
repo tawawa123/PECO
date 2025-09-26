@@ -89,7 +89,7 @@ public class PlayerLockon : MonoBehaviour
 
             // ロックオン対象の検索、いるならロックオン、いないならカメラ角度をリセット
             targetObj = GetLockonTarget();
-            //Debug.Log("tagetObj: " + targetObj);
+            // Debug.Log("tagetObj: " + targetObj);
             if (targetObj)
             {
                 isLockon = true;
@@ -178,6 +178,7 @@ public class PlayerLockon : MonoBehaviour
     private List<GameObject> makeListRaycastHit(RaycastHit[] hits)
     {
         List<GameObject> hitObjects = new List<GameObject>();
+        Debug.Log(hits[0].collider.gameObject.transform.position);
         RaycastHit hit;
         for (var i = 0; i < hits.Length; i++)
         {
@@ -190,7 +191,7 @@ public class PlayerLockon : MonoBehaviour
                     hitObjects.Add(hit.collider.gameObject);
                 }
             }
-            //Debug.DrawRay(originTrn.position, direction * lockonRange, Color.red);
+            Debug.DrawRay(originTrn.position, direction * lockonRange, Color.red);
         }
         return hitObjects;
     }
