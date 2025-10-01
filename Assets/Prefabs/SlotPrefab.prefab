@@ -168,7 +168,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2, y: -17}
+  m_AnchoredPosition: {x: 2, y: -46.1}
   m_SizeDelta: {x: 278.4, y: 69.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5410819833828549993
@@ -203,8 +203,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 19b23b5a3269019478a36ff31d3f3806, type: 2}
+  m_sharedMaterial: {fileID: 490412004226458370, guid: 19b23b5a3269019478a36ff31d3f3806, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -228,15 +228,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64.6
-  m_fontSizeBase: 64.6
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -354,7 +354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3907181069036772480}
-  - component: {fileID: 7739910237782816944}
+  - component: {fileID: 62742449970755685}
   m_Layer: 5
   m_Name: SlotPrefab
   m_TagString: Untagged
@@ -385,7 +385,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &7739910237782816944
+--- !u!114 &62742449970755685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -394,7 +394,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4907821789615407387}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ab12765f9118c94aabd235892d2b24d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1cb29eacd103bca4b84b8a12ce3c0da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   iconImage: {fileID: 4606318902635916036}
@@ -655,7 +655,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7739910237782816944}
+      - m_Target: {fileID: 62742449970755685}
         m_TargetAssemblyTypeName: BagSlotUI, Assembly-CSharp
         m_MethodName: OnClickSlot
         m_Mode: 1
