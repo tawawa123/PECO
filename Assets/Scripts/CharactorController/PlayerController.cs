@@ -154,7 +154,7 @@ namespace StateManager
 
                 // Avoid
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
-                    Owner.animationState.SetState("ScrewKick");
+                    Owner.animationState.SetState("Rolling");
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
@@ -204,7 +204,7 @@ namespace StateManager
 
                 // Avoid
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
-                    Owner.animationState.SetState("ScrewKick");
+                    Owner.animationState.SetState("Rolling");
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
@@ -251,7 +251,7 @@ namespace StateManager
                 }
                 
                 // アニメーションが終了した時にIdleに遷移
-                if(Owner.animationState.AnimtionFinish("ScrewKick") >= 1f)
+                if(Owner.animationState.AnimtionFinish("Rolling") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 

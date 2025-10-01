@@ -84,12 +84,12 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                Owner.AA.SetAttackArea();
                 Debug.Log("start Idle");
             }
 
             public override void OnUpdate()
             {
-                Owner.AA.StartAttackHit();
                 Owner.animationState.SetState("walk", true);
                 StateMachine.ChangeState((int) StateType.Round);
 
@@ -355,12 +355,11 @@ namespace StateManager
             public override void OnStart()
             {
                 Debug.Log("start Attack");
+                Owner.AA.StartAttackHit();
             }
 
             public override void OnUpdate()
             {
-                Owner.AA.StartAttackHit();
-
                 // 攻撃アニメーションが終了したらButtleに遷移
                 if(Owner.animationState.AnimtionFinish("Attack") >= 1f){
                     Owner.AA.EndAttackHit();
