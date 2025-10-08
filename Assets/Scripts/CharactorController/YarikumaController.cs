@@ -133,32 +133,41 @@ namespace StateManager
                 }
 
                 posDelta = Owner.player.transform.position - Owner.transform.position;
-                
-                // プレイヤーがエネミーの視界に入っているかの判定
-                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetViewRange)
-                {
-                    target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
+                float distance = posDelta.magnitude;
 
-                    if (target_angle < Owner.enemyStatus.GetViewAngle) //target_angleがangleに収まっているかどうか
-                    {
-                        Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
-                        if(Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
-                        {
-                            if (hit.collider.gameObject.tag == "Player")
-                            {
-                                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange)
-                                {
-                                    Owner.animationState.SetState("Run", true);
-                                    //視界内の危険距離内に入っていればチェイス開始
-                                    StateMachine.ChangeState((int) StateType.Chase);
-                                }
-                                else{
-                                    Owner.animationState.SetState("Idle", true);
-                                    StateMachine.ChangeState((int) StateType.Vigilance); //視界内なら警戒開始
-                                }
-                            }
-                        }
-                    }
+                // 1. 視界範囲外なら終了
+                if (distance > Owner.enemyStatus.GetViewRange)
+                    return;
+
+                // 2. 視界角度外なら終了
+                float targetAngle = Vector3.Angle(Owner.transform.forward, posDelta);
+                if (targetAngle >= Owner.enemyStatus.GetViewAngle)
+                    return;
+
+                // 3. Raycastでプレイヤーに遮蔽物があるなら終了
+                Vector3 eyePosition = Owner.transform.position + Vector3.up * 1.5f;
+                Vector3 direction = posDelta.normalized;
+
+                if (!Physics.Raycast(eyePosition, direction, out RaycastHit hit, distance))
+                    return;
+
+                if (!hit.collider.CompareTag("Player"))
+                    return;
+
+
+                // --- ここまで来たら「視界にプレイヤーが見えている」と確定 ---
+                Debug.DrawRay(eyePosition, direction * distance, Color.red, 0.1f);
+
+                // 4. 危険距離の判定
+                if (distance <= Owner.enemyStatus.GetWarningRange)
+                {
+                    Owner.animationState.SetState("Run", true);
+                    StateMachine.ChangeState((int)StateType.Chase);
+                }
+                else
+                {
+                    Owner.animationState.SetState("Idle", true);
+                    StateMachine.ChangeState((int)StateType.Vigilance);
                 }
 
                 // ダメージ処理が起きたらここでストップ
@@ -201,16 +210,20 @@ namespace StateManager
                     StateMachine.ChangeState((int) StateType.Round);
                 }
 
-                if (target_angle < Owner.enemyStatus.GetViewAngle) //target_angleがangleに収まっているかどうか
+
+                // 警戒状態時に、プレイヤーが視界内に入り続けているかを判定する
+                // 視界外なら終了
+                if (target_angle >= Owner.enemyStatus.GetViewAngle)
+                    return;
+                
+                // rayがプレイヤーにあたらなかったら終了
+                Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
+                if(!Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
+                    return;
+
+                if (hit.collider.gameObject.tag == "Player")
                 {
-                    Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
-                    if(Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
-                    {
-                        if (hit.collider.gameObject.tag == "Player")
-                        {
-                            PlusVigilancePoint();
-                        }
-                    }
+                    PlusVigilancePoint();
                 }
             }
 

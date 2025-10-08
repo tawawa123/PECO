@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Hide
   layers:
   - Default
   - TransparentFX
@@ -12,14 +13,14 @@ TagManager:
   - 
   - Water
   - UI
+  - Ground
   - Enemy
-  - 
   - PlayerHit
   - EnemyHit
   - PlayerAttack
   - EnemyAttack
   - Dead
-  - 
+  - Avoid
   - 
   - 
   - 

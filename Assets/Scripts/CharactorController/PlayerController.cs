@@ -15,6 +15,8 @@ namespace StateManager
         private float inputVertical;
         private Vector3 moveForward;
         private Quaternion targetRotation;
+        // 着地判定変数
+        private bool isGrounded;
         // カメラ回転制御
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
@@ -23,8 +25,13 @@ namespace StateManager
         private enum StateType
         {
             Idle,
-            Move,
+            Walk,
             Run,
+            Jump,
+            Fall,
+            Sliding,
+            Crouch,
+            CrouchWalk,
             Avoid,
             Hide,
             Backstab,
@@ -43,7 +50,8 @@ namespace StateManager
         private Rigidbody rb;
 
 
-        void Start() {
+        void Start() 
+        {
             rb = GetComponent<Rigidbody>();
             playerStatus = GetComponent<PlayerStatus>();
             playerLo = GetComponent<PlayerLockon>();
@@ -51,53 +59,47 @@ namespace StateManager
 
             // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<PlayerController>(this);
-            stateMachine.Add<StateIdle>((int) StateType.Idle);
-            stateMachine.Add<StateMove>((int) StateType.Move);
-            stateMachine.Add<StateRun>((int) StateType.Run);
-            stateMachine.Add<StateAvoid>((int) StateType.Avoid);
-            stateMachine.Add<StateHide>((int) StateType.Hide);
-            stateMachine.Add<StateBackstab>((int) StateType.Backstab);
-            stateMachine.Add<StateStun>((int) StateType.Stun);
-            stateMachine.Add<StateAttack>((int) StateType.Attack);
-            stateMachine.Add<StateDamage>((int) StateType.Damage);
-            stateMachine.Add<StateGameOver>((int) StateType.GameOver);
-
-            stateMachine.OnStart((int) StateType.Idle);
+            stateMachine.Add<StateIdle>((int) StateType.Idle);              // Idle
+            stateMachine.Add<StateWalk>((int) StateType.Walk);              // 通常歩行
+            stateMachine.Add<StateRun>((int) StateType.Run);                // ダッシュ
+            stateMachine.Add<StateJump>((int) StateType.Jump);              // ジャンプ
+            stateMachine.Add<StateFall>((int) StateType.Fall);              // 落下中の着地判定
+            stateMachine.Add<StateSliding>((int) StateType.Sliding);        // スライディング
+            stateMachine.Add<StateCrouch>((int) StateType.Crouch);          // しゃがみ
+            stateMachine.Add<StateCrouchWalk>((int) StateType.CrouchWalk);  // しゃがみ歩き
+            stateMachine.Add<StateAvoid>((int) StateType.Avoid);            // 回避
+            stateMachine.Add<StateHide>((int) StateType.Hide);              // 隠密状態
+            stateMachine.Add<StateBackstab>((int) StateType.Backstab);      // バックスタブ
+            stateMachine.Add<StateStun>((int) StateType.Stun);              // スタン
+            stateMachine.Add<StateAttack>((int) StateType.Attack);          // 攻撃
+            stateMachine.Add<StateDamage>((int) StateType.Damage);          // ダメージ処理
+            stateMachine.Add<StateGameOver>((int) StateType.GameOver);      // 死亡時処理
 
             AA = this.GetComponentInChildren<AttackArea>();
             AA.SetAttackArea();
+
+            stateMachine.OnStart((int) StateType.Idle);
         }
         
-        void Update() {
+        void Update() 
+        {
+            // 着地判定
+            isGrounded = Physics.CheckSphere(transform.position, 0.1f, LayerMask.GetMask("Ground"));
+            Debug.Log(isGrounded);
+
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
 
             if(playerStatus.GetHp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
 
-            if (moveForward != Vector3.zero)
-            {
-                if (playerLo.isLockon)
-                {
-                    // ロックオン中はターゲットを向き続ける
-                    Quaternion from = transform.rotation;
-                    var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
-                    dir.y = 0;
-                    Quaternion to = Quaternion.LookRotation(dir);
-                    transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
-                }
-                else
-                {
-                    Quaternion from = transform.rotation;
-                    Quaternion to = Quaternion.LookRotation(moveForward);
-                    transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeed * Time.deltaTime);
-                }
-            }
-
             stateMachine.OnUpdate();
         }
 
-        public bool Backstab(){
+
+        // 攻撃したときにバクスタ可能な位置にいるかどうかの判定
+        public bool Backstab()
+        {
             bool backstab = false;
             GameObject[] gos;
             gos = GameObject.FindGameObjectsWithTag("Enemy");
@@ -128,6 +130,24 @@ namespace StateManager
             return backstab;
         }
 
+        // ロックオン中のターゲット注視処理
+        public void LockForEnemy()
+        {
+            // ロックオン中はターゲットを向き続ける
+            Quaternion from = transform.rotation;
+            var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
+            dir.y = 0;
+            Quaternion to = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
+        }
+
+        // 足元に判定用の球を描画
+        void OnDrawGizmos()
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(transform.position, 0.5f);
+        }
+
 
 /// <summary>
 /// 以下ステートマシン
@@ -142,31 +162,52 @@ namespace StateManager
             public override void OnStart()
             {
                 Debug.Log("start Idle");
+
+                Owner.animationState.SetState("Idle", true);
             }
 
             public override void OnUpdate()
             {
-                // Move
-                if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f){
-                    Owner.animationState.SetState("Run", true);
-                    StateMachine.ChangeState((int) StateType.Move);
+                if (Owner.playerLo.isLockon) Owner.LockForEnemy();
+
+                // Hide
+                if(Input.GetKeyDown(KeyCode.F))
+                {
+                    StateMachine.ChangeState((int) StateType.Hide);
+                }
+
+                // Crouch
+                if(Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    StateMachine.ChangeState((int) StateType.Crouch);
+                }
+
+                // Walk
+                if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f)
+                {
+                    StateMachine.ChangeState((int) StateType.Walk);
                 }
 
                 // Avoid
-                if(Input.GetKeyDown(KeyCode.LeftShift)){
-                    Owner.animationState.SetState("Rolling");
+                if(Input.GetKeyDown(KeyCode.LeftShift))
+                {
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
                 // Attack or Backstab
-                if (Input.GetMouseButtonDown(0)){
+                if (Input.GetMouseButtonDown(0))
+                {
                     if(Owner.Backstab()){
-                        Owner.animationState.SetState("Backstab");
                         StateMachine.ChangeState((int) StateType.Backstab);
                     } else{
-                        Owner.animationState.SetState("Jab");
                         StateMachine.ChangeState((int) StateType.Attack);
                     }
+                }
+
+                // jump
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    StateMachine.ChangeState((int) StateType.Jump);
                 }
             }
 
@@ -177,12 +218,13 @@ namespace StateManager
         }
 
 
-        // move state 
-        private class StateMove : StateBase
+        // walk state 
+        private class StateWalk : StateBase
         {
             public override void OnStart()
             {
-                Debug.Log("start move");
+                Owner.animationState.SetState("Walk", true);
+                Debug.Log("start walk");
             }
 
             public override void OnUpdate()
@@ -191,9 +233,12 @@ namespace StateManager
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
                 Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, Owner.rb.velocity.y, 0);
+
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
+
+                    if (Owner.playerLo.isLockon) Owner.LockForEnemy();
                 }
 
                 // Idle
@@ -204,59 +249,33 @@ namespace StateManager
 
                 // Avoid
                 if(Input.GetKeyDown(KeyCode.LeftShift)){
-                    Owner.animationState.SetState("Rolling");
+                    Quaternion from = Owner.transform.rotation;
+                    Quaternion to = Quaternion.LookRotation(Owner.moveForward);
+                    Owner.transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeed);
+
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
                     if(Owner.Backstab()){
-                        Owner.animationState.SetState("Backstab");
                         StateMachine.ChangeState((int) StateType.Backstab);
                     } else{
-                        Owner.animationState.SetState("Jab");
                         StateMachine.ChangeState((int) StateType.Attack);
                     }
+                }
+
+                // Crouch
+                if (Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    StateMachine.ChangeState((int) StateType.Crouch);
                 }
             }
 
             public override void OnEnd()
             {
                 Owner.rb.velocity = Vector3.zero;
-                Debug.Log("end move");
-            }
-        }
-
-
-        // avoid state 
-        private class StateAvoid : StateBase
-        {
-            private bool once;
-
-            public override void OnStart()
-            {
-                Debug.Log("start avoid");
-            }
-
-            public override void OnUpdate()
-            {
-                if(once){
-                    if(Owner.rb.velocity.magnitude >= 0.1f){
-                        Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
-                    } else {
-                        Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
-                    }
-                    once = false;
-                }
-                
-                // アニメーションが終了した時にIdleに遷移
-                if(Owner.animationState.AnimtionFinish("Rolling") >= 1f)
-                    StateMachine.ChangeState((int) StateType.Idle);
-            }
-
-            public override void OnEnd()
-            {
-                Debug.Log("end avoid");
+                Debug.Log("end walk");
             }
         }
 
@@ -266,17 +285,255 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                Owner.animationState.SetState("Run", true);
                 Debug.Log("start run");
             }
 
             public override void OnUpdate()
             {
+                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                // 移動方向にスピードを掛ける
+                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetRunSpeed + new Vector3(0, Owner.rb.velocity.y, 0);
+                
+                // 向いている方向に回転
+                if (Owner.moveForward != Vector3.zero) {
+                    Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
+                    Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
+                }
 
+                // Idle
+                if(Owner.rb.velocity.magnitude < 0.1f){
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+
+                // Avoid
+                if(Input.GetKeyDown(KeyCode.LeftShift)){
+                    Quaternion from = Owner.transform.rotation;
+                    Quaternion to = Quaternion.LookRotation(Owner.moveForward);
+                    Owner.transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeed);
+
+                    StateMachine.ChangeState((int) StateType.Avoid);
+                }
+
+                // Attack or Backstab
+                if (Input.GetMouseButtonDown(0)){
+                    if(Owner.Backstab()){
+                        StateMachine.ChangeState((int) StateType.Backstab);
+                    } else{
+                        StateMachine.ChangeState((int) StateType.Attack);
+                    }
+                }
+
+                // sliding
+                if (Input.GetKeyDown(KeyCode.LeftControl)){
+                    StateMachine.ChangeState((int) StateType.Sliding);
+                }
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end run");
+            }
+        }
+
+
+        // state Jump
+        private class StateJump : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Jump");
+
+                Owner.animationState.SetState("Jump");
+                Owner.rb.AddForce(Owner.transform.up * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
+            }
+
+            public override void OnUpdate()
+            {
+                // 方向制御
+                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, Owner.rb.velocity.y, 0);
+
+                if(Owner.animationState.AnimtionFinish("Jump") >= 1f)
+                {
+                    StateMachine.ChangeState((int) StateType.Fall);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Jump");
+            }
+        }
+
+        
+        // state Fall
+        private class StateFall : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Fall");
+
+                Owner.animationState.SetState("Fall");
+            }
+
+            public override void OnUpdate()
+            {
+                // 方向制御
+                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, Owner.rb.velocity.y, 0);
+
+                // 着地
+                if(Owner.isGrounded)
+                {
+                    Owner.animationState.SetState("Land");
+                }
+
+                // idle
+                if(Owner.animationState.AnimtionFinish("Land") >= 1f)
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Fall");
+            }
+        }
+
+
+        // avoid state 
+        private class StateAvoid : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start avoid");
+
+                Owner.animationState.SetState("Rolling");
+                Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                Owner.gameObject.layer = LayerMask.NameToLayer("Avoid");
+            }
+
+            public override void OnUpdate()
+            {   
+                // アニメーション終了時の処理
+                if(Owner.animationState.AnimtionFinish("Rolling") >= 0.6f && Input.GetKey(KeyCode.LeftShift))
+                {
+                    StateMachine.ChangeState((int) StateType.Run);
+                } 
+                else if(Owner.animationState.AnimtionFinish("Rolling") >= 1f)
+                    StateMachine.ChangeState((int) StateType.Idle);
+            }
+
+            public override void OnEnd()
+            {
+                Owner.gameObject.layer = LayerMask.NameToLayer("PlayerHit");
+                Debug.Log("end avoid");
+            }
+        }
+
+
+        // state crouch
+        private class StateCrouch : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Crouch");
+
+                Owner.animationState.SetState("Crouch", true);
+                Owner.gameObject.tag = "Hide";
+            }
+
+            public override void OnUpdate()
+            {
+                if(Input.GetKeyDown(KeyCode.F))
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+
+                if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f)
+                {
+                    StateMachine.ChangeState((int) StateType.CrouchWalk);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Crouch");
+                Owner.gameObject.tag = "Player";
+            }
+        }
+
+
+        // CrouchWalk state 
+        private class StateCrouchWalk : StateBase
+        {
+            public override void OnStart()
+            {
+                Owner.animationState.SetState("CrouchWalk", true);
+                Debug.Log("start CrouchWalk");
+
+                Owner.gameObject.tag = "Hide";
+            }
+
+            public override void OnUpdate()
+            {
+                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                // 移動方向にスピードを掛ける
+                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, Owner.rb.velocity.y, 0);
+
+                if (Owner.moveForward != Vector3.zero) {
+                    Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
+                    Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
+
+                    if (Owner.playerLo.isLockon) Owner.LockForEnemy();
+                }
+
+                // Idle
+                if(Owner.rb.velocity.magnitude < 0.1f){
+                    StateMachine.ChangeState((int) StateType.Crouch);
+                }
+
+                if(Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Owner.rb.velocity = Vector3.zero;
+                Owner.gameObject.tag = "Player";
+                Debug.Log("end CrouchWalk");
+            }
+        }
+
+
+        // state sliding 
+        private class StateSliding : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start sliding");
+
+                Owner.rb.AddForce(Owner.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                Owner.animationState.SetState("Sliding", true);
+            }
+
+            public override void OnUpdate()
+            {
+                if(Owner.animationState.AnimtionFinish("Sliding") >= 0.75f)
+                    StateMachine.ChangeState((int) StateType.Crouch);
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Sliding");
             }
         }
 
@@ -287,16 +544,23 @@ namespace StateManager
             public override void OnStart()
             {
                 Debug.Log("start hide");
+
+                Owner.animationState.SetState("Hide", true);
+                Owner.gameObject.tag = "Hide";
             }
 
             public override void OnUpdate()
             {
-                
+                if(Input.GetKeyDown(KeyCode.F))
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end hide");
+                Owner.gameObject.tag = "Player";
             }
         }
 
@@ -306,14 +570,13 @@ namespace StateManager
         {
             public override void OnStart()
             {
-                
                 Debug.Log("start backstab");
+
+                Owner.animationState.SetState("Backstab");
             }
 
             public override void OnUpdate()
             {
-                Debug.Log("バクスタ判定が出ました！");
-
                 if(Owner.animationState.AnimtionFinish("Backstab") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
@@ -353,20 +616,23 @@ namespace StateManager
             {
                 Owner.AA.StartAttackHit();
                 Debug.Log("start attack");
+
+                Owner.animationState.SetState("Jab", true);
             }
 
             public override void OnUpdate()
             {
-                // 攻撃アニメーションが終了したらIdleに遷移
+                // Idle
                 if(Owner.animationState.AnimtionFinish("Jab") > 1.01f){
                     Owner.AA.EndAttackHit();
+                    //Owner.animationState.SetState("Jab");
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
             }
 
             public override void OnEnd()
             {
-                //Owner.AA.EndAttackHit();
+                Owner.AA.EndAttackHit();
                 Debug.Log("end attack");
             }
         }
