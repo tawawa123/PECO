@@ -235,7 +235,6 @@ namespace StateManager
 
             public override void OnStart()
             {
-                once = true;
                 Debug.Log("start avoid");
             }
 
