@@ -7,21 +7,21 @@ using UnityEngine;
 /// </summary>
 public class PlayerLockon : MonoBehaviour
 {
-    [SerializeField] PlayerCamera playerCamera;
-    [SerializeField] Transform originTrn;
-    [SerializeField] float lockonRange = 20;
-    [SerializeField] LayerMask lockonLayers = 0;
-    [SerializeField] LayerMask lockonObstacleLayers = 0;
-    [SerializeField] GameObject lockonCursor;
+    [SerializeField] private PlayerCamera playerCamera;
+    [SerializeField] private Transform originTrn;
+    [SerializeField] private float lockonRange = 20;
+    [SerializeField] private LayerMask lockonLayers = 0;
+    [SerializeField] private LayerMask lockonObstacleLayers = 0;
+    [SerializeField] private GameObject lockonCursor;
 
-    float lockonFactor = 0.3f;
-    float lockonThreshold = 0.5f;
-    bool lockonInput = false;
+    private float lockonFactor = 0.3f;
+    private float lockonThreshold = 0.5f;
+    private bool lockonInput = false;
     public bool isLockon = false;
 
-    Camera mainCamera;
-    Transform cameraTrn;
-    GameObject targetObj;
+    private Camera mainCamera;
+    private Transform cameraTrn;
+    private GameObject targetObj;
 
     void Start()
     {
@@ -64,10 +64,10 @@ public class PlayerLockon : MonoBehaviour
             // ターゲットが死亡した時ロックオンを外す
             if(targetObj == null && isLockon)
             {
+                playerCamera.InactiveLockonCamera();
                 isLockon = false;
                 lockonCursor.SetActive(false);
                 lockonInput = false;
-                playerCamera.InactiveLockonCamera();
                 targetObj = null;
                 return;
             }
@@ -99,6 +99,7 @@ public class PlayerLockon : MonoBehaviour
             else
             {
                 playerCamera.ResetFreeLookCamera();
+                //cameraReset.ResetCameraBehindPlayer();
             }
             lockonInput = false;
         }

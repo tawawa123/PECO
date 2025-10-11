@@ -20,6 +20,6 @@ public class EnemyHP : MonoBehaviour
     void Update()
     {
         slider.value = e_status.GetHp;
-        this.gameObject.transform.LookAt(GameObject.Find("Free Camera").transform.position);
+        this.gameObject.transform.LookAt(GameObject.Find("Main Camera").transform.position);
     }
 }

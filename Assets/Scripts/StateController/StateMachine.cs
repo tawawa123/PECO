@@ -109,7 +109,10 @@ namespace StateManager
                 return;
             }
             // 前のステートと現在のステートを入れ替える
-            (_prevState, _currentState) = (_currentState, _prevState);
+            _currentState.OnEnd();
+            _currentState = _prevState;
+            _currentState.OnStart();
+            // (_prevState, _currentState) = (_currentState, _prevState);
         }
     }
 }

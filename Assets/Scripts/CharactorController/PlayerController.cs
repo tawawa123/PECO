@@ -84,8 +84,7 @@ namespace StateManager
         void Update() 
         {
             // 着地判定
-            isGrounded = Physics.CheckSphere(transform.position, 0.1f, LayerMask.GetMask("Ground"));
-            Debug.Log(isGrounded);
+            isGrounded = Physics.CheckSphere(transform.position, 0.3f, LayerMask.GetMask("Ground"));
 
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
@@ -124,28 +123,29 @@ namespace StateManager
             float Angle = Vector3.Angle(closest.transform.forward, this.transform.forward);
             if(Mathf.Abs(Angle) < 20.0f){
                 backstab = true;
+                Debug.Log(closest.GetComponent<EnemyStatus>());
                 closest.GetComponent<EnemyStatus>().m_backstabed = true;
             }
 
             return backstab;
         }
 
-        // ロックオン中のターゲット注視処理
-        public void LockForEnemy()
-        {
-            // ロックオン中はターゲットを向き続ける
-            Quaternion from = transform.rotation;
-            var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
-            dir.y = 0;
-            Quaternion to = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
-        }
+        // // ロックオン中のターゲット注視処理
+        // public void LockForEnemy()
+        // {
+        //     // ロックオン中はターゲットを向き続ける
+        //     Quaternion from = transform.rotation;
+        //     var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
+        //     dir.y = 0;
+        //     Quaternion to = Quaternion.LookRotation(dir);
+        //     transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
+        // }
 
-        // 足元に判定用の球を描画
+        // 足元に設置判定を描画
         void OnDrawGizmos()
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(transform.position, 0.5f);
+            Gizmos.DrawWireSphere(transform.position, 0.3f);
         }
 
 
@@ -168,8 +168,6 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if (Owner.playerLo.isLockon) Owner.LockForEnemy();
-
                 // Hide
                 if(Input.GetKeyDown(KeyCode.F))
                 {
@@ -237,8 +235,6 @@ namespace StateManager
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
-
-                    if (Owner.playerLo.isLockon) Owner.LockForEnemy();
                 }
 
                 // Idle
@@ -256,6 +252,12 @@ namespace StateManager
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
+                // jump
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    StateMachine.ChangeState((int) StateType.Jump);
+                }
+
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
                     if(Owner.Backstab()){
@@ -270,11 +272,17 @@ namespace StateManager
                 {
                     StateMachine.ChangeState((int) StateType.Crouch);
                 }
+
+                // fall
+                if (!Owner.isGrounded)
+                {
+                    StateMachine.ChangeState((int) StateType.Fall);
+                }
             }
 
             public override void OnEnd()
             {
-                Owner.rb.velocity = Vector3.zero;
+                // Owner.rb.velocity = Vector3.zero;
                 Debug.Log("end walk");
             }
         }
@@ -316,6 +324,12 @@ namespace StateManager
                     StateMachine.ChangeState((int) StateType.Avoid);
                 }
 
+                // jump
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    StateMachine.ChangeState((int) StateType.Jump);
+                }
+
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0)){
                     if(Owner.Backstab()){
@@ -328,6 +342,12 @@ namespace StateManager
                 // sliding
                 if (Input.GetKeyDown(KeyCode.LeftControl)){
                     StateMachine.ChangeState((int) StateType.Sliding);
+                }
+
+                // fall
+                if (!Owner.isGrounded)
+                {
+                    StateMachine.ChangeState((int) StateType.Fall);
                 }
             }
 
@@ -345,7 +365,7 @@ namespace StateManager
             {
                 Debug.Log("start Jump");
 
-                Owner.animationState.SetState("Jump");
+                Owner.animationState.SetState("Jump", true);
                 Owner.rb.AddForce(Owner.transform.up * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
             }
 
@@ -354,10 +374,13 @@ namespace StateManager
                 // 方向制御
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
-                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, Owner.rb.velocity.y, 0);
+                Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, Owner.rb.velocity.y, 0);
 
-                if(Owner.animationState.AnimtionFinish("Jump") >= 1f)
+                // 着地
+                if(Owner.animationState.AnimtionFinish("Jump") >= 0.5f && Owner.isGrounded)
                 {
+                    StateMachine.ChangePrevState();
+                } else if (Owner.animationState.AnimtionFinish("Jump") >= 1f && !Owner.isGrounded) {
                     StateMachine.ChangeState((int) StateType.Fall);
                 }
             }
@@ -376,7 +399,7 @@ namespace StateManager
             {
                 Debug.Log("start Fall");
 
-                Owner.animationState.SetState("Fall");
+                Owner.animationState.SetState("Fall", true);
             }
 
             public override void OnUpdate()
@@ -450,7 +473,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if(Input.GetKeyDown(KeyCode.F))
+                if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
@@ -490,13 +513,17 @@ namespace StateManager
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
-
-                    if (Owner.playerLo.isLockon) Owner.LockForEnemy();
                 }
 
-                // Idle
+                // crouch
                 if(Owner.rb.velocity.magnitude < 0.1f){
                     StateMachine.ChangeState((int) StateType.Crouch);
+                }
+
+                // walk
+                if(Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    StateMachine.ChangeState((int) StateType.Walk);
                 }
 
                 if(Input.GetKeyDown(KeyCode.LeftControl))

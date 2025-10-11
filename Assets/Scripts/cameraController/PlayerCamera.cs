@@ -6,21 +6,40 @@ using Cinemachine;
 /// </summary>
 public class PlayerCamera : MonoBehaviour
 {
-    [SerializeField] Camera mainCamera;
-    [SerializeField] CinemachineFreeLook freeLookCamera;
-    [SerializeField] CinemachineVirtualCamera lockonCameral;
+    [Header("フリーカメラ")]
+    [SerializeField] CinemachineVirtualCamera freeLookCamera;
+    [Header("ロックオンカメラ")]
+    [SerializeField] CinemachineVirtualCamera lockonCamera;
+    [Header("プレイヤー")]
+    [SerializeField] Transform player;
+
+    [SerializeField] private float resetSpeed = 3f; // カメラリセットのスピード
+    public bool resetting = false;
+    private Quaternion targetRotation;
+    private Transform cameraTarget;
+
+    // カメラ優先度
     readonly int LockonCameraActivePriority = 11;
     readonly int LockonCameraInactivePriority = 0;
 
-    public void Update() { }
+    private void LateUpdate()
+    {
+    }
 
     /// <summary>
     /// カメラの角度をプレイヤーを基準にリセット
     /// </summary>
     public void ResetFreeLookCamera()
     {
-        // 未実装
+        var test = freeLookCamera.GetComponent<CinemaChineResetAngle>();
+        test.ResetCameraBehindPlayer();
+        
+        cameraTarget = lockonCamera.Follow;
+        Vector3 lookDir = player.forward;
+        targetRotation = Quaternion.LookRotation(lookDir, Vector3.up);
+        resetting = true;
     }
+
 
     /// <summary>
     /// ロックオン時のVirtualCamera切り替え
@@ -28,8 +47,8 @@ public class PlayerCamera : MonoBehaviour
     /// <param name="target"></param>
     public void ActiveLockonCamera(GameObject target)
     {
-        lockonCameral.Priority = LockonCameraActivePriority;
-        lockonCameral.LookAt = target.transform;
+        lockonCamera.Priority = LockonCameraActivePriority;
+        lockonCamera.LookAt = target.transform;
     }
 
 
@@ -38,12 +57,12 @@ public class PlayerCamera : MonoBehaviour
     /// </summary>
     public void InactiveLockonCamera()
     {
-        lockonCameral.Priority = LockonCameraInactivePriority;
-        lockonCameral.LookAt = null;
+        lockonCamera.Priority = LockonCameraInactivePriority;
+        lockonCamera.LookAt = null;
     }
 
     public Transform GetLookAtTransform()
     {
-        return lockonCameral.LookAt.transform;
+        return lockonCamera.LookAt.transform;
     }
 }
