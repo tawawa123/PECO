@@ -110,12 +110,10 @@ namespace StateManager
         private class StateRound : StateBase
         {
             Vector3 posDelta;
-            float target_angle;
 
             public override void OnStart()
             {
                 posDelta = Vector3.zero;
-                target_angle = 0;
                 Owner.navAgent.SetDestination(Owner.destination.GetDestination());
 
                 Debug.Log("start Round");
