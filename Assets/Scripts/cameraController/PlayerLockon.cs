@@ -62,7 +62,7 @@ public class PlayerLockon : MonoBehaviour
             }
 
             // ターゲットが死亡した時ロックオンを外す
-            if(targetObj == null && isLockon)
+            if (targetObj == null && isLockon)
             {
                 playerCamera.InactiveLockonCamera();
                 isLockon = false;
@@ -87,8 +87,8 @@ public class PlayerLockon : MonoBehaviour
                 return;
             }
 
-            // ロックオン対象の検索、いるならロックオン、いないならカメラ角度をリセット
-            targetObj = GetLockonTarget();
+            // ロックオン対象の検索、いるならロックオン
+            targetObj = GetLockonTarget(lockonRange);
             // Debug.Log("tagetObj: " + targetObj);
             if (targetObj)
             {
@@ -98,8 +98,8 @@ public class PlayerLockon : MonoBehaviour
             }
             else
             {
-                playerCamera.ResetFreeLookCamera();
-                //cameraReset.ResetCameraBehindPlayer();
+                // ロックオン対象がいないならカメラ角度をリセットしたい
+                playerCamera.InactiveLockonCamera();
             }
             lockonInput = false;
         }
@@ -121,28 +121,12 @@ public class PlayerLockon : MonoBehaviour
         }
     }
 
-    // public void OnLockon(InputAction.CallbackContext context)
-    // {
-    //     switch (context.phase)
-    //     {
-    //         case InputActionPhase.Performed:
-    //             // ボタンが押された時の処理
-    //             lockonInput = true;
-    //             //Debug.Log("lockonInput: " + lockonInput);
-    //             break;
-
-    //         case InputActionPhase.Canceled:
-    //             // ボタンが離された時の処理
-    //             break;
-    //     }
-    // }
-
     /// <summary>
     /// ロックオン対象の計算処理を行い取得する
     /// 計算は3つの工程に分かれる
     /// </summary>
     /// <returns></returns>
-    GameObject GetLockonTarget()
+    public GameObject GetLockonTarget(float lockonRange)
     {
         // 1. SphereCastAllを使ってPlayer周辺のEnemyを取得しListに格納
         RaycastHit[] hits = Physics.SphereCastAll(originTrn.position, lockonRange, Vector3.up, 0, lockonLayers);
@@ -179,7 +163,6 @@ public class PlayerLockon : MonoBehaviour
     private List<GameObject> makeListRaycastHit(RaycastHit[] hits)
     {
         List<GameObject> hitObjects = new List<GameObject>();
-        Debug.Log(hits[0].collider.gameObject.transform.position);
         RaycastHit hit;
         for (var i = 0; i < hits.Length; i++)
         {

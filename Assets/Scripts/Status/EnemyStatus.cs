@@ -29,6 +29,9 @@ public class EnemyStatus : MonoBehaviour
 	public float m_viewAngle = 0.0f;
 
 	[SerializeField]
+	public float m_vigilancePoint = 0.0f;
+
+	[SerializeField]
 	public float m_stun = 0;
 
 	[SerializeField]
@@ -45,6 +48,7 @@ public class EnemyStatus : MonoBehaviour
 	public float GetViewRange 		{ get{ return m_viewRange; } }
 	public float GetWarningRange 	{ get{ return m_warningRange; } }
 	public float GetViewAngle 		{ get{ return m_viewAngle; } }
+	public float GetVigilancePoint 	{ get{ return m_vigilancePoint; } }
 	public float GetStun 			{ get{ return m_stun; } }
 	public bool GetBackstabed 		{ get{ return m_backstabed; } }
 }

@@ -15,8 +15,13 @@ namespace StateManager
         private float inputVertical;
         private Vector3 moveForward;
         private Quaternion targetRotation;
-        // 着地判定変数
+
+        // 着地判定フラグ
         private bool isGrounded;
+
+        // ステルス攻撃用フラグ
+        private bool canStealthAttack = false;
+
         // カメラ回転制御
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
@@ -25,6 +30,8 @@ namespace StateManager
         private enum StateType
         {
             Idle,
+
+            // Move   
             Walk,
             Run,
             Jump,
@@ -34,18 +41,24 @@ namespace StateManager
             CrouchWalk,
             Avoid,
             Hide,
+
+            // Battle
             Backstab,
             Stun,
             Attack,
+            StealthAttack,
+            DashAttack,
             Damage,
+
+            // 死亡
             GameOver,
         }
-
 
         private StateMachine<PlayerController> stateMachine; //ステート遷移制御
         private AttackArea AA; //攻撃判定
         private PlayerStatus playerStatus; //登録ステータス
         private AwaitableAnimatorState animationState; //アニメーション遷移制御
+        private OverrideDamageLayer damageLayer;
         private PlayerLockon playerLo; //ロックオンカメラ制御
         private Rigidbody rb;
 
@@ -56,33 +69,38 @@ namespace StateManager
             playerStatus = GetComponent<PlayerStatus>();
             playerLo = GetComponent<PlayerLockon>();
             animationState = GetComponent<AwaitableAnimatorState>();
+            damageLayer = GetComponent<OverrideDamageLayer>();
 
             // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<PlayerController>(this);
-            stateMachine.Add<StateIdle>((int) StateType.Idle);              // Idle
-            stateMachine.Add<StateWalk>((int) StateType.Walk);              // 通常歩行
-            stateMachine.Add<StateRun>((int) StateType.Run);                // ダッシュ
-            stateMachine.Add<StateJump>((int) StateType.Jump);              // ジャンプ
-            stateMachine.Add<StateFall>((int) StateType.Fall);              // 落下中の着地判定
-            stateMachine.Add<StateSliding>((int) StateType.Sliding);        // スライディング
-            stateMachine.Add<StateCrouch>((int) StateType.Crouch);          // しゃがみ
-            stateMachine.Add<StateCrouchWalk>((int) StateType.CrouchWalk);  // しゃがみ歩き
-            stateMachine.Add<StateAvoid>((int) StateType.Avoid);            // 回避
-            stateMachine.Add<StateHide>((int) StateType.Hide);              // 隠密状態
-            stateMachine.Add<StateBackstab>((int) StateType.Backstab);      // バックスタブ
-            stateMachine.Add<StateStun>((int) StateType.Stun);              // スタン
-            stateMachine.Add<StateAttack>((int) StateType.Attack);          // 攻撃
-            stateMachine.Add<StateDamage>((int) StateType.Damage);          // ダメージ処理
-            stateMachine.Add<StateGameOver>((int) StateType.GameOver);      // 死亡時処理
+            stateMachine.Add<StateIdle>((int) StateType.Idle);                      // Idle
+            stateMachine.Add<StateWalk>((int) StateType.Walk);                      // 通常歩行
+            stateMachine.Add<StateRun>((int) StateType.Run);                        // ダッシュ
+            stateMachine.Add<StateJump>((int) StateType.Jump);                      // ジャンプ
+            stateMachine.Add<StateFall>((int) StateType.Fall);                      // 落下中の着地判定
+            stateMachine.Add<StateSliding>((int) StateType.Sliding);                // スライディング
+            stateMachine.Add<StateCrouch>((int) StateType.Crouch);                  // しゃがみ
+            stateMachine.Add<StateCrouchWalk>((int) StateType.CrouchWalk);          // しゃがみ歩き
+            stateMachine.Add<StateAvoid>((int) StateType.Avoid);                    // 回避
+            stateMachine.Add<StateHide>((int) StateType.Hide);                      // 隠密状態
+            stateMachine.Add<StateBackstab>((int) StateType.Backstab);              // バックスタブ
+            stateMachine.Add<StateStun>((int) StateType.Stun);                      // スタン
+            stateMachine.Add<StateAttack>((int) StateType.Attack);                  // 攻撃
+            stateMachine.Add<StateStealthAttack>((int) StateType.StealthAttack);    // ステルスアタック
+            stateMachine.Add<StateDashAttack>((int) StateType.DashAttack);          // ダッシュ派生攻撃
+            stateMachine.Add<StateDamage>((int) StateType.Damage);                  // ダメージ処理
+            stateMachine.Add<StateGameOver>((int) StateType.GameOver);              // 死亡時処理
 
             AA = this.GetComponentInChildren<AttackArea>();
             AA.SetAttackArea();
 
             stateMachine.OnStart((int) StateType.Idle);
         }
-        
+
         void Update() 
         {
+            // LockForEnemy();
+
             // 着地判定
             isGrounded = Physics.CheckSphere(transform.position, 0.3f, LayerMask.GetMask("Ground"));
 
@@ -130,16 +148,22 @@ namespace StateManager
             return backstab;
         }
 
-        // // ロックオン中のターゲット注視処理
-        // public void LockForEnemy()
-        // {
-        //     // ロックオン中はターゲットを向き続ける
-        //     Quaternion from = transform.rotation;
-        //     var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
-        //     dir.y = 0;
-        //     Quaternion to = Quaternion.LookRotation(dir);
-        //     transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
-        // }
+        public void CanStealthAttack(bool stealthAttackParam)
+        {
+            // ステルスアタック用のフラグ
+            this.canStealthAttack = stealthAttackParam;
+        }
+
+        // ロックオン中のターゲット注視処理
+        public void LockForEnemy()
+        {
+            // ロックオン中はターゲットを向き続ける
+            Quaternion from = transform.rotation;
+            var dir = playerLo.GetLockonCameraLookAtTransform().position - transform.position;
+            dir.y = 0;
+            Quaternion to = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.RotateTowards(from, to, RotateSpeedLockon * Time.deltaTime);
+        }
 
         // 足元に設置判定を描画
         void OnDrawGizmos()
@@ -149,12 +173,12 @@ namespace StateManager
         }
 
 
-/// <summary>
-/// 以下ステートマシン
-/// StateMachine.StateBaseクラスを継承した各ステート定義用クラスを作成し、動作を記述
-/// StateMachine.ChangeState => 指定したステートに状態遷移
-/// StateMachine.ChangePrevState => ひとつ前のステートに状態遷移
-/// </summary>
+        /// <summary>
+        /// 以下ステートマシン
+        /// StateMachine.StateBaseクラスを継承した各ステート定義用クラスを作成し、動作を記述
+        /// StateMachine.ChangeState => 指定したステートに状態遷移
+        /// StateMachine.ChangePrevState => ひとつ前のステートに状態遷移
+        /// </summary>
 
         // idle state
         private class StateIdle : StateBase
@@ -195,11 +219,7 @@ namespace StateManager
                 // Attack or Backstab
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if(Owner.Backstab()){
-                        StateMachine.ChangeState((int) StateType.Backstab);
-                    } else{
-                        StateMachine.ChangeState((int) StateType.Attack);
-                    }
+                    StateMachine.ChangeState((int) StateType.Attack);
                 }
 
                 // jump
@@ -259,12 +279,9 @@ namespace StateManager
                 }
 
                 // Attack or Backstab
-                if (Input.GetMouseButtonDown(0)){
-                    if(Owner.Backstab()){
-                        StateMachine.ChangeState((int) StateType.Backstab);
-                    } else{
-                        StateMachine.ChangeState((int) StateType.Attack);
-                    }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    StateMachine.ChangeState((int) StateType.Attack);
                 }
 
                 // Crouch
@@ -331,12 +348,9 @@ namespace StateManager
                 }
 
                 // Attack or Backstab
-                if (Input.GetMouseButtonDown(0)){
-                    if(Owner.Backstab()){
-                        StateMachine.ChangeState((int) StateType.Backstab);
-                    } else{
-                        StateMachine.ChangeState((int) StateType.Attack);
-                    }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    StateMachine.ChangeState((int) StateType.DashAttack);
                 }
 
                 // sliding
@@ -473,14 +487,22 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                // idle 
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
 
+                // courchWalk
                 if(Mathf.Abs(Owner.inputHorizontal) >= 0.1f || Mathf.Abs(Owner.inputVertical) >= 0.1f)
                 {
                     StateMachine.ChangeState((int) StateType.CrouchWalk);
+                }
+
+                // stealthAttack
+                if (Input.GetMouseButtonDown(0) && Owner.canStealthAttack)
+                {
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
                 }
             }
 
@@ -526,9 +548,16 @@ namespace StateManager
                     StateMachine.ChangeState((int) StateType.Walk);
                 }
 
+                // idle
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
+                }
+
+                // stealthAttack
+                if (Input.GetMouseButtonDown(0) && Owner.canStealthAttack)
+                {
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
                 }
             }
 
@@ -592,6 +621,120 @@ namespace StateManager
         }
 
 
+        // state attack
+        private class StateAttack : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start attack");
+
+                // 攻撃時に特殊攻撃状態か判定
+
+                // ステルスアタック
+                // バクスタよりも優先して発動させる
+                if(Owner.canStealthAttack)
+                {
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
+                    return;
+                }
+                
+                // バックスタブ
+                if(Owner.Backstab())
+                {
+                    StateMachine.ChangeState((int) StateType.Backstab);
+                    return;
+                }
+
+                Owner.AA.StartAttackHit();
+                Owner.animationState.SetState("Jab", true);
+            }
+
+            public override void OnUpdate()
+            {
+                // Idle
+                if(Owner.animationState.AnimtionFinish("Jab") > 1.01f){
+                    Owner.AA.EndAttackHit();
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Owner.AA.EndAttackHit();
+                Debug.Log("end attack");
+            }
+        }
+
+
+        // state dashAttack
+        private class StateDashAttack : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start dashAttack");
+
+                // 特殊攻撃判定
+
+                // ステルスアタック
+                if(Owner.canStealthAttack)
+                {
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
+                    return;
+                }
+                
+                // バクスタ
+                if(Owner.Backstab())
+                {
+                    StateMachine.ChangeState((int) StateType.Backstab);
+                    return;
+                }
+
+                Owner.AA.StartAttackHit();
+                Owner.animationState.SetState("DashAttack", true);
+            }
+
+            public override void OnUpdate()
+            {
+                // Idle
+                if(Owner.animationState.AnimtionFinish("DashAttack") > 1.01f){
+                    Owner.AA.EndAttackHit();
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Owner.AA.EndAttackHit();
+                Debug.Log("end dashAttack");
+            }
+        }
+
+
+        // state stealthAttack
+        private class StateStealthAttack : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start stealthAttack");
+
+                // Owner.AA.StartAttackHit();
+                // Owner.animationState.SetState("Jab", true);
+            }
+
+            public override void OnUpdate()
+            {
+                // Idle
+                StateMachine.ChangeState((int) StateType.Idle);
+            }
+
+            public override void OnEnd()
+            {
+                Owner.AA.EndAttackHit();
+                Debug.Log("end stealthAttack");
+            }
+        }
+
+
         // state backstab 
         private class StateBackstab : StateBase
         {
@@ -599,6 +742,9 @@ namespace StateManager
             {
                 Debug.Log("start backstab");
 
+                if(Owner.canStealthAttack)
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
+                
                 Owner.animationState.SetState("Backstab");
             }
 
@@ -611,6 +757,38 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end backstab");
+            }
+        }
+
+
+        // ダメージ処理用インターフェイス
+        public void AddDamage(int damage){
+            // playerStatus.m_hp -= damage;
+            stateMachine.ChangeState((int) StateType.Damage);
+        }
+        // ダメージが発生した時の体力管理やアニメーション再生用のメソッド
+        private class StateDamage : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Damage");
+                Debug.Log(Owner.playerStatus.GetHp);
+                Owner.damageLayer.SetState("Light_Damage", true);
+            }
+
+            public override void OnUpdate()
+            {
+                // Idle
+                if(Owner.damageLayer.AnimtionFinish("Light_Damage") > 0.7f){
+                    Owner.AA.EndAttackHit();
+                    Owner.damageLayer.SetState("None", true);
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Damage");
             }
         }
 
@@ -632,61 +810,6 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end stun");
-            }
-        }
-
-
-        // state attack
-        private class StateAttack : StateBase
-        {
-            public override void OnStart()
-            {
-                Owner.AA.StartAttackHit();
-                Debug.Log("start attack");
-
-                Owner.animationState.SetState("Jab", true);
-            }
-
-            public override void OnUpdate()
-            {
-                // Idle
-                if(Owner.animationState.AnimtionFinish("Jab") > 1.01f){
-                    Owner.AA.EndAttackHit();
-                    //Owner.animationState.SetState("Jab");
-                    StateMachine.ChangeState((int) StateType.Idle);
-                }
-            }
-
-            public override void OnEnd()
-            {
-                Owner.AA.EndAttackHit();
-                Debug.Log("end attack");
-            }
-        }
-
-
-        // ダメージ処理用インターフェイス
-        public void AddDamage(int damage){
-            // playerStatus.m_hp -= damage;
-            stateMachine.ChangeState((int) StateType.Damage);
-        }
-        // ダメージが発生した時の体力管理やアニメーション再生用のメソッド
-        private class StateDamage : StateBase
-        {
-            public override void OnStart()
-            {
-                Debug.Log("start Damage");
-                Debug.Log(Owner.playerStatus.GetHp);
-            }
-
-            public override void OnUpdate()
-            {
-                StateMachine.ChangeState((int) StateType.Idle);
-            }
-
-            public override void OnEnd()
-            {
-                Debug.Log("end Damage");
             }
         }
 

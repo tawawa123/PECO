@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-public class AwaitableAnimatorState : MonoBehaviour
+public class OverrideDamageLayer : MonoBehaviour
 {
     private void Start()
     {
@@ -13,7 +13,7 @@ public class AwaitableAnimatorState : MonoBehaviour
 
     private Animator _animator;
     private bool loop = false;
-    public const string StateDefault = "default";
+    public const string StateDefault = "None";
 
     [SerializeField] private string State = StateDefault;
     public float DurationTimeSecond;
@@ -33,7 +33,7 @@ public class AwaitableAnimatorState : MonoBehaviour
             }
 
             var hashExpect = Animator.StringToHash(State);
-            var currentState = _animator.GetCurrentAnimatorStateInfo(0);
+            var currentState = _animator.GetCurrentAnimatorStateInfo(1);
             if (currentState.shortNameHash != hashExpect)
             {
                 // DurationTimeSecondの間隔を挟んでAnimatorのStateを切り替える
@@ -56,7 +56,7 @@ public class AwaitableAnimatorState : MonoBehaviour
     {
         this.loop = loop;
         this.DurationTimeSecond = DurationTimeSecond;
-        if (_animator.HasState(0, Animator.StringToHash(nextState)))
+        if (_animator.HasState(1, Animator.StringToHash(nextState)))
         {
             // 存在するStateだけ受け入れる
             State = nextState;
@@ -65,8 +65,8 @@ public class AwaitableAnimatorState : MonoBehaviour
 
     public float AnimtionFinish(string animationName)
     {
-        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
+        if (!_animator.GetCurrentAnimatorStateInfo(1).IsName(animationName))
             return 0;
-        return _animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        return _animator.GetCurrentAnimatorStateInfo(1).normalizedTime;
     }
 }

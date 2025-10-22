@@ -8,8 +8,12 @@ namespace Cinemachine
     public class CinemachineRestrictAngle : CinemachineExtension
     {
         /// <summary>
-        /// field を public にすることで SaveDuringPlay が可能になる
+        /// 上下方向のアングルを固定
+        /// ロックオン時にカメラが必要以上に頭上へ移動するような挙動の抑制
+        /// 視認性向上のために導入
         /// </summary>
+        
+        // field を public にすることで SaveDuringPlay が可能になる
         [Header("適用段階")]
         public CinemachineCore.Stage m_ApplyAfter = CinemachineCore.Stage.Aim;
 

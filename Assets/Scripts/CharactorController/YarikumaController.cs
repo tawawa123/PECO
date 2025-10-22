@@ -1,7 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace StateManager
 {
@@ -84,17 +86,16 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                Owner.animationState.SetState("Idle", true);
                 Owner.AA.SetAttackArea();
                 Debug.Log("start Idle");
             }
 
             public override void OnUpdate()
             {
-                Owner.animationState.SetState("walk", true);
                 StateMachine.ChangeState((int) StateType.Round);
 
                 if (Owner.findPlayer){
-                    Owner.animationState.SetState("Conbat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
@@ -113,6 +114,7 @@ namespace StateManager
 
             public override void OnStart()
             {
+                Owner.animationState.SetState("Walk", true);
                 posDelta = Vector3.zero;
                 Owner.navAgent.SetDestination(Owner.destination.GetDestination());
 
@@ -121,7 +123,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                Owner.vigilancePoint = Mathf.Clamp((Owner.vigilancePoint - 0.05f), 0f, 100f);
+                Owner.enemyStatus.m_vigilancePoint = Mathf.Clamp((Owner.enemyStatus.m_vigilancePoint - 0.05f), 0f, 100f);
 
                 //navmeshによる巡回処理
                 if(Vector3.Distance(Owner.transform.position, Owner.destination.GetDestination()) < 1.5f)
@@ -153,23 +155,23 @@ namespace StateManager
                     return;
 
 
-                // --- ここまで来たら「視界にプレイヤーが見えている」と確定 ---
+                // --- 視界にプレイヤーが見えている際の処理 ---
                 Debug.DrawRay(eyePosition, direction * distance, Color.red, 0.1f);
 
                 // 4. 危険距離の判定
                 if (distance <= Owner.enemyStatus.GetWarningRange)
                 {
-                    Owner.animationState.SetState("Run", true);
+                    Owner.enemyStatus.m_vigilancePoint = 100f;
                     StateMachine.ChangeState((int)StateType.Chase);
                 }
                 else
                 {
-                    Owner.animationState.SetState("Idle", true);
                     StateMachine.ChangeState((int)StateType.Vigilance);
                 }
 
+                Debug.Log(Owner.enemyStatus.m_vigilancePoint);
                 // ダメージ処理が起きたらここでストップ
-                if(Owner.vigilancePoint >= 100f)
+                if(Owner.enemyStatus.m_vigilancePoint >= 100f)
                     StateMachine.ChangeState((int) StateType.Battle);
             }
 
@@ -180,72 +182,120 @@ namespace StateManager
         }
 
 
-        // エネミーの警戒処理　警戒状態に入ってからプレイヤーを発見する、もしくは見失う処理
+        // vigilance
         private class StateVigilance : StateBase
         {
             Vector3 posDelta;
-            float target_angle;
+            float timer = 0;
+            CancellationTokenSource cts;
 
             public override void OnStart()
             {
-                posDelta = Vector3.zero;
-                target_angle = 0;
-
+                Owner.animationState.SetState("Search", true);
                 Owner.navAgent.SetDestination(Owner.transform.position);
+
                 Debug.Log("start Vigilance");
+
+                // 警戒処理の開始
+                cts = new CancellationTokenSource();
+                VigilanceLoopAsync(cts.Token).Forget();
             }
 
-            public override void OnUpdate()
+            /// <summary>
+            /// 警戒状態の監視ループ（非同期）
+            /// </summary>
+            private async UniTaskVoid VigilanceLoopAsync(CancellationToken token)
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    // 視界にプレイヤーがいなければ、タイマーを進めて次のフレームへ
+                    if (!IsPlayerVisible(out float distance))
+                    {
+                        HandleInvisible(Time.deltaTime);
+                        await UniTask.Yield(token);
+                        continue;
+                    }
+
+                    // 見えている → タイマーリセット＋警戒ポイント加算
+                    timer = 0f;
+                    PlusVigilancePoint(distance);
+
+                    await UniTask.Yield(token);
+                }
+            }
+
+            /// <summary>
+            /// プレイヤーが視界内にいるかを判定
+            /// </summary>
+            private bool IsPlayerVisible(out float distance)
             {
                 posDelta = Owner.player.transform.position - Owner.transform.position;
-                target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
+                distance = posDelta.magnitude;
 
-                //エネミーの視界から抜けた時の処理
-                if(Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange)
+                // 視界範囲外
+                if (distance >= Owner.enemyStatus.GetViewRange)
+                    return false;
+
+                // 視野角外
+                float angle = Vector3.Angle(Owner.transform.forward, posDelta);
+                if (angle >= Owner.enemyStatus.GetViewAngle)
+                    return false;
+
+                // Rayがヒットしない
+                if (!Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit, Owner.enemyStatus.GetViewRange))
+                    return false;
+
+                // ヒットしたのがプレイヤーでなければ除外
+                if (!hit.collider.CompareTag("Player"))
+                    return false;
+
+                return true;
+            }
+
+            /// <summary>
+            /// 見失っている間のカウント処理
+            /// </summary>
+            private void HandleInvisible(float deltaTime)
+            {
+                timer += deltaTime;
+
+                if (timer >= 5f)
                 {
-                    Owner.animationState.SetState("walk", true);
-                    // 5秒間くらい処理を回して、なお視界外ならRoundステートに戻る
-                    StateMachine.ChangeState((int) StateType.Round);
+                    StateMachine.ChangeState((int)StateType.Round);
+                }
+            }
+
+            /// <summary>
+            /// プレイヤーが視界内のときの警戒度加算処理
+            /// </summary>
+            private void PlusVigilancePoint(float distance)
+            {
+                const float MAX = 100;
+                const float MIN = 0;
+
+                // プレイヤーの距離が近いと警戒度が最大に
+                if (distance <= Owner.enemyStatus.GetWarningRange)
+                {
+                    Owner.enemyStatus.m_vigilancePoint = MAX;
+                }
+                // 距離に応じて警戒度の上昇量が上がる
+                else
+                {
+                    float inverseProportion = 1 - Mathf.InverseLerp(1, Owner.enemyStatus.GetViewRange, distance);
+                    Owner.enemyStatus.m_vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
                 }
 
-
-                // 警戒状態時に、プレイヤーが視界内に入り続けているかを判定する
-                // 視界外なら終了
-                if (target_angle >= Owner.enemyStatus.GetViewAngle)
-                    return;
-                
-                // rayがプレイヤーにあたらなかったら終了
-                Debug.DrawRay(Owner.transform.position, posDelta, Color.red, 5);
-                if(!Physics.Raycast(Owner.transform.position, posDelta, out RaycastHit hit)) //Rayを使用してtargetに当たっているか判別
-                    return;
-
-                if (hit.collider.gameObject.tag == "Player")
+                // Chase
+                if (Mathf.Clamp(Owner.enemyStatus.m_vigilancePoint, MIN, MAX) >= MAX)
                 {
-                    PlusVigilancePoint();
+                    StateMachine.ChangeState((int)StateType.Chase);
                 }
             }
 
             public override void OnEnd()
             {
                 Debug.Log("end Vigilance");
-            }
-
-            private void PlusVigilancePoint()
-            {
-                float MAX = 100;
-                float MIN = 0;
-
-                if(Mathf.Abs(posDelta.magnitude) <= Owner.enemyStatus.GetWarningRange) //危険距離内
-                    Owner.vigilancePoint = MAX;
-                
-                var inverseProportion = (1 - Mathf.InverseLerp(1, Owner.enemyStatus.GetViewRange, Mathf.Abs(posDelta.magnitude)));
-                Owner.vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
-                
-                // 警戒度100以上でチェイス開始
-                if(Mathf.Clamp(Owner.vigilancePoint, MIN, MAX) >= MAX){
-                    Owner.animationState.SetState("Run", true);
-                    StateMachine.ChangeState((int) StateType.Chase);
-                }
+                cts.Cancel();
             }
         }
 
@@ -258,6 +308,8 @@ namespace StateManager
 
             public override void OnStart()
             {
+                Owner.animationState.SetState("Run", true);
+
                 posDelta = Vector3.zero;
                 //target_angle = 0;
                 Owner.navAgent.speed = 4;
@@ -269,21 +321,18 @@ namespace StateManager
                 posDelta = Owner.player.transform.position - Owner.transform.position;
                 //target_angle = Vector3.Angle(Owner.transform.forward, posDelta);
 
-                Debug.Log("追跡中");
                 // navmeshでプレイヤーの座標まで移動する
                 Owner.navAgent.SetDestination(Owner.player.transform.position);
 
                 // プレイヤーとの距離が一定以下になればBattleステートへ移行
                 if (Mathf.Abs(posDelta.magnitude) <= 5.0f){
                     Owner.navAgent.ResetPath();
-                    Owner.animationState.SetState("Combat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
 
                 // エネミーの視界外にプレイヤーが抜けたらVigilanceステートへ移行
                 if (Mathf.Abs(posDelta.magnitude) >= Owner.enemyStatus.GetViewRange){
-                    Owner.vigilancePoint -= 5.0f;
-                    Owner.animationState.SetState("Idle", true);
+                    Owner.enemyStatus.m_vigilancePoint -= 5.0f;
                     StateMachine.ChangeState((int) StateType.Vigilance);
                 }
             }
@@ -305,11 +354,13 @@ namespace StateManager
 
             public override void OnStart()
             {
+                Owner.animationState.SetState("Combat", true);
+
                 posDelta = Vector3.zero;
 
                 // プレイヤーの周囲を動くための目的地設定
-                Transform p = Owner.player.transform;
-                float centerAngle = Mathf.Atan2(p.forward.z, p.forward.x) * Mathf.Rad2Deg;
+                Transform playerPos = Owner.player.transform;
+                float centerAngle = Mathf.Atan2(playerPos.forward.z, playerPos.forward.x) * Mathf.Rad2Deg;
                 float randomOffset = Random.Range(-60f, 60f); // ±60°の範囲
                 targetAngle = centerAngle + randomOffset;
 
@@ -323,16 +374,14 @@ namespace StateManager
                 posDelta = Owner.player.transform.position - Owner.transform.position;
 
                 if(Mathf.Abs(posDelta.magnitude) >= 15f){
-                    Owner.animationState.SetState("Chase", true);
                     Owner.navAgent.angularSpeed = 120;
-                    StateMachine.ChangeState((int) StateType.Vigilance);
+                    StateMachine.ChangeState((int) StateType.Chase);
                 }
 
                 Vector3 destination = GetPointOnArc(Owner.player.transform.position, 3.0f, targetAngle);
                 Owner.navAgent.SetDestination(destination);
 
                 if(Mathf.Abs((Owner.transform.position - destination).magnitude) <= 0.5f){
-                    Owner.animationState.SetState("Attack", true);
                     StateMachine.ChangeState((int) StateType.Attack);
                 }
 
@@ -365,8 +414,10 @@ namespace StateManager
         {
             public override void OnStart()
             {
-                Debug.Log("start Attack");
+                Owner.animationState.SetState("Attack", true);
                 Owner.AA.StartAttackHit();
+
+                Debug.Log("start Attack");
             }
 
             public override void OnUpdate()
@@ -374,7 +425,6 @@ namespace StateManager
                 // 攻撃アニメーションが終了したらButtleに遷移
                 if(Owner.animationState.AnimtionFinish("Attack") >= 1f){
                     Owner.AA.EndAttackHit();
-                    Owner.animationState.SetState("Combat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
@@ -395,16 +445,17 @@ namespace StateManager
         {
             public override void OnStart()
             {
+                Owner.animationState.SetState("Damage", true);
+
                 Debug.Log("start Damage");
                 Debug.Log(Owner.enemyStatus.GetHp);
-                Owner.vigilancePoint = 100f;
+                Owner.enemyStatus.m_vigilancePoint = 100f;
                 Owner.animationState.SetState("Damage", true);
             }
 
             public override void OnUpdate()
             {
                 if(Owner.animationState.AnimtionFinish("Damage") >= 1f){
-                    Owner.animationState.SetState("Combat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
@@ -420,19 +471,19 @@ namespace StateManager
         {
             public override void OnStart()
             {
-                Debug.Log("start Backstabed");
                 Debug.Log(Owner.enemyStatus.GetHp);
 
-                Owner.vigilancePoint = 100f;
+                Owner.enemyStatus.m_vigilancePoint = 100f;
                 Owner.animationState.SetState("Backstabed", true);
 
                 Owner.navAgent.speed = 0;
+
+                Debug.Log("start Backstabed");
             }
 
             public override void OnUpdate()
             {
                 if(Owner.animationState.AnimtionFinish("Backstabed") >= 1f){
-                    Owner.animationState.SetState("Combat", true);
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
