@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace StateManager
 {
@@ -10,6 +11,9 @@ namespace StateManager
 
     public class PlayerController : MonoBehaviour, Damagable
     {
+        [SerializeField] private GameObject cutInUI;
+        [SerializeField] private GameObject stealthAttackEffect;
+
         //プレイヤー移動、回転制御
         private float inputHorizontal;
         private float inputVertical;
@@ -25,6 +29,9 @@ namespace StateManager
         // カメラ回転制御
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
+
+        // 設置判定の大きさ
+        private const float isGroundedSize = 0.1f;
 
         // StateTypeの定義
         private enum StateType
@@ -62,6 +69,8 @@ namespace StateManager
         private PlayerLockon playerLo; //ロックオンカメラ制御
         private Rigidbody rb;
 
+        private GameObject stealthAttackTarget; // ステルスアタックの対象位置
+
 
         void Start() 
         {
@@ -93,6 +102,7 @@ namespace StateManager
 
             AA = this.GetComponentInChildren<AttackArea>();
             AA.SetAttackArea();
+            cutInUI.SetActive(false);
 
             stateMachine.OnStart((int) StateType.Idle);
         }
@@ -102,7 +112,7 @@ namespace StateManager
             // LockForEnemy();
 
             // 着地判定
-            isGrounded = Physics.CheckSphere(transform.position, 0.3f, LayerMask.GetMask("Ground"));
+            isGrounded = Physics.CheckSphere(transform.position, isGroundedSize, LayerMask.GetMask("Ground"));
 
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
@@ -148,10 +158,16 @@ namespace StateManager
             return backstab;
         }
 
-        public void CanStealthAttack(bool stealthAttackParam)
+        public void CanStealthAttack(bool stealthAttackFlag)
         {
             // ステルスアタック用のフラグ
-            this.canStealthAttack = stealthAttackParam;
+            this.canStealthAttack = stealthAttackFlag;
+        }
+
+        public void SetTarget(GameObject currentTarget)
+        {
+            // ステルスアタックのターゲット設定
+            this.stealthAttackTarget = currentTarget;
         }
 
         // ロックオン中のターゲット注視処理
@@ -169,7 +185,7 @@ namespace StateManager
         void OnDrawGizmos()
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(transform.position, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, isGroundedSize);
         }
 
 
@@ -193,10 +209,10 @@ namespace StateManager
             public override void OnUpdate()
             {
                 // Hide
-                if(Input.GetKeyDown(KeyCode.F))
-                {
-                    StateMachine.ChangeState((int) StateType.Hide);
-                }
+                // if(Input.GetKeyDown(KeyCode.F))
+                // {
+                //     StateMachine.ChangeState((int) StateType.Hide);
+                // }
 
                 // Crouch
                 if(Input.GetKeyDown(KeyCode.LeftControl))
@@ -713,18 +729,52 @@ namespace StateManager
         // state stealthAttack
         private class StateStealthAttack : StateBase
         {
+            private CancellationTokenSource cts;
+            private bool canAnimationPlay = false;
+
             public override void OnStart()
             {
                 Debug.Log("start stealthAttack");
 
-                // Owner.AA.StartAttackHit();
-                // Owner.animationState.SetState("Jab", true);
+                cts = new CancellationTokenSource();
+                PlayCutInAsync(cts.Token).Forget();
+
+                Owner.animationState.SetState("Idle", true);
+            }
+
+            private async UniTask PlayCutInAsync(CancellationToken token, float displayDuration = 1f)
+            {
+                Time.timeScale = 0f;
+                Owner.cutInUI.SetActive(true);
+
+                // この辺でプレイヤーを透明に
+                // Owner.transform.position = Owner.stealthAttackTarget.transform.position;
+
+                // カットイン時間待機
+                await UniTask.Delay(System.TimeSpan.FromSeconds(displayDuration), ignoreTimeScale: true);
+
+                Owner.cutInUI.SetActive(false);
+                Time.timeScale = 1f;
+
+                // エフェクトの生成
+                Instantiate(Owner.stealthAttackEffect, Owner.stealthAttackTarget.transform.position, Quaternion.identity);
+                Owner.stealthAttackTarget.GetComponent<StealthAttackable>().HaveStealthAttack();
+                // エフェクト再生時間待機
+                await UniTask.Delay(System.TimeSpan.FromSeconds(2.5f), ignoreTimeScale: true);
+
+                canAnimationPlay = true;
             }
 
             public override void OnUpdate()
             {
-                // Idle
-                StateMachine.ChangeState((int) StateType.Idle);
+                if(canAnimationPlay)
+                {
+                    Owner.animationState.SetState("Jab", true);
+                    canAnimationPlay = false;
+                }
+
+                if(Owner.animationState.AnimtionFinish("Jab") > 1f)
+                    StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()

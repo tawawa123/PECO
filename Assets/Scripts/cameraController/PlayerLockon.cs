@@ -17,7 +17,7 @@ public class PlayerLockon : MonoBehaviour
     private float lockonFactor = 0.3f;
     private float lockonThreshold = 0.5f;
     private bool lockonInput = false;
-    public bool isLockon = false;
+    private bool isLockon = false;
 
     private Camera mainCamera;
     private Transform cameraTrn;
@@ -327,4 +327,8 @@ public class PlayerLockon : MonoBehaviour
         return playerCamera.GetLookAtTransform();
     }
 
+    public bool GetIsLockon()
+    {
+        return isLockon;
+    }
 }

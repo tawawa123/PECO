@@ -13,10 +13,10 @@ public class OverrideDamageLayer : MonoBehaviour
 
     private Animator _animator;
     private bool loop = false;
-    public const string StateDefault = "None";
+    private const string StateDefault = "None";
 
     [SerializeField] private string State = StateDefault;
-    public float DurationTimeSecond;
+    [SerializeField] private float DurationTimeSecond;
 
     private async UniTaskVoid AnimationStateLoop()
     {

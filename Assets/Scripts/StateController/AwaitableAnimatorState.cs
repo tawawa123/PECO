@@ -13,10 +13,10 @@ public class AwaitableAnimatorState : MonoBehaviour
 
     private Animator _animator;
     private bool loop = false;
-    public const string StateDefault = "default";
+    private const string StateDefault = "Idle";
 
     [SerializeField] private string State = StateDefault;
-    public float DurationTimeSecond;
+    [SerializeField] private float DurationTimeSecond;
 
     private async UniTaskVoid AnimationStateLoop()
     {

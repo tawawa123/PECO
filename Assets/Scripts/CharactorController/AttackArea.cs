@@ -8,7 +8,7 @@ public class AttackArea : MonoBehaviour
     private Collider attackAreaCollider = null;
 
     // 攻撃したした回数　多段ヒット防止用
-    int attackCount = 0;
+    private int attackCount = 0;
 
     public void Start()
     {
@@ -39,14 +39,15 @@ public class AttackArea : MonoBehaviour
     private void OnTriggerEnter (Collider other)
     {
         Debug.Log(attackCount);
-        if(attackCount < 2){
+        if(attackCount <= 1){
             switch(LayerMask.LayerToName(other.gameObject.layer))
             {
                 case "PlayerHit":
-                    PlayerStatus pStatus = other.gameObject.GetComponent<PlayerStatus>();
+                    attackCount++;
+                    PlayerStatus pStatus = other.gameObject.GetComponentInParent<PlayerStatus>();
                     pStatus.m_hp -= AttackDamage;
 
-                    var damagetarget1 = other.gameObject.GetComponent<Damagable>();
+                    var damagetarget1 = other.gameObject.GetComponentInParent<Damagable>();
                     
                     if (damagetarget1 != null){
                         other.gameObject.GetComponent<Damagable>().AddDamage(AttackDamage);
@@ -55,6 +56,7 @@ public class AttackArea : MonoBehaviour
                     break;
 
                 case "EnemyHit":
+                    attackCount++;
                     EnemyStatus eStatus = other.gameObject.GetComponent<EnemyStatus>();
                     eStatus.m_hp -= AttackDamage;
 
@@ -67,5 +69,10 @@ public class AttackArea : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private void CalculateDamage(GameObject attacker, Damagable diffender)
+    {
+
     }
 }

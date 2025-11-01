@@ -9,11 +9,10 @@ namespace StateManager
 {
     using StateBase = StateMachine<YarikumaController>.StateBase;
 
-    public class YarikumaController : MonoBehaviour, Damagable
+    public class YarikumaController : MonoBehaviour, Damagable, StealthAttackable
     {
         [SerializeField] private GameObject player;
         private bool findPlayer = false;
-        private float vigilancePoint = 0;
 
         private enum StateType
         {
@@ -25,6 +24,7 @@ namespace StateManager
             Attack,
             Damage,
             Backstabed,
+            StealthAttacked,
             Death,
         }
 
@@ -56,6 +56,7 @@ namespace StateManager
             stateMachine.Add<StateAttack>((int) StateType.Attack);
             stateMachine.Add<StateDamage>((int) StateType.Damage);
             stateMachine.Add<StateBackstabed>((int) StateType.Backstabed);
+            stateMachine.Add<StateStealthAttacked>((int) StateType.StealthAttacked);
             stateMachine.Add<StateDeath>((int) StateType.Death);
 
             stateMachine.OnStart((int) StateType.Idle);
@@ -150,6 +151,8 @@ namespace StateManager
 
                 if (!Physics.Raycast(eyePosition, direction, out RaycastHit hit, distance))
                     return;
+
+                Debug.Log(hit.collider.CompareTag("Player"));
 
                 if (!hit.collider.CompareTag("Player"))
                     return;
@@ -283,6 +286,7 @@ namespace StateManager
                 {
                     float inverseProportion = 1 - Mathf.InverseLerp(1, Owner.enemyStatus.GetViewRange, distance);
                     Owner.enemyStatus.m_vigilancePoint += Mathf.Lerp(0.05f, 0.1f, inverseProportion);
+                    Owner.enemyStatus.m_vigilancePoint = Mathf.Clamp(Owner.enemyStatus.m_vigilancePoint, MIN, MAX);
                 }
 
                 // Chase
@@ -463,6 +467,38 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end Damage");
+            }
+        }
+
+
+        // 特殊攻撃用インターフェイス
+        public void HaveStealthAttack(){
+            navAgent.isStopped = true;
+            stateMachine.ChangeState((int) StateType.StealthAttacked);
+        }
+        private class StateStealthAttacked : StateBase
+        {
+            private CancellationTokenSource cts;
+
+            public override void OnStart()
+            {
+                Debug.Log("start StealthAttacked");
+                Owner.enemyStatus.m_vigilancePoint = 100f;
+                cts = new CancellationTokenSource();
+                Owner.animationState.SetState("StealthAttacked", true);
+
+                DelayDeth(cts.Token).Forget();
+            }
+
+            private async UniTask DelayDeth(CancellationToken token)
+            {
+                await UniTask.Delay(System.TimeSpan.FromSeconds(2.5f));
+                Owner.enemyStatus.m_hp = 0;
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end StealthAttacked");
             }
         }
 
