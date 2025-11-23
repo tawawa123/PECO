@@ -64,6 +64,7 @@ public class StealthAttackOwner : MonoBehaviour
 
     private bool CheckTargetOnFront()
     {
+
         var cameraTransform = targetCamera.transform;
 
         var cameraDir = cameraTransform.forward; // カメラの向き

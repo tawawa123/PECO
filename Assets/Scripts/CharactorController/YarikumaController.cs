@@ -152,8 +152,6 @@ namespace StateManager
                 if (!Physics.Raycast(eyePosition, direction, out RaycastHit hit, distance))
                     return;
 
-                Debug.Log(hit.collider.CompareTag("Player"));
-
                 if (!hit.collider.CompareTag("Player"))
                     return;
 

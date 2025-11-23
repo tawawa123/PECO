@@ -109,7 +109,11 @@ public class UseShortcutItem : MonoBehaviour
             itemCount.text = Inventory.Instance.items[shortcutManager.shortcutSlots[currentIndex]].ToString();
         }
 
+        // ショートカットスロットに何も入っていなかったら処理をスルー
+        if(shortcutManager.shortcutSlots[currentIndex] == 0)
+            return;
 
+        // ショートカットスロット内のアイテムが0個になったら削除
         if(Inventory.Instance.items[shortcutManager.shortcutSlots[currentIndex]] == 0)
         {
             Clear();

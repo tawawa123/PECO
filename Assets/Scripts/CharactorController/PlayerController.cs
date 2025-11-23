@@ -13,6 +13,7 @@ namespace StateManager
     {
         [SerializeField] private GameObject cutInUI;
         [SerializeField] private GameObject stealthAttackEffect;
+        [SerializeField] private MeshRenderer weapon;
 
         //プレイヤー移動、回転制御
         private float inputHorizontal;
@@ -67,7 +68,7 @@ namespace StateManager
         private AwaitableAnimatorState animationState; //アニメーション遷移制御
         private OverrideDamageLayer damageLayer;
         private PlayerLockon playerLo; //ロックオンカメラ制御
-        private Rigidbody rb;
+        private Rigidbody rb; //リジッドボディ
 
         private GameObject stealthAttackTarget; // ステルスアタックの対象位置
 
@@ -103,6 +104,7 @@ namespace StateManager
             AA = this.GetComponentInChildren<AttackArea>();
             AA.SetAttackArea();
             cutInUI.SetActive(false);
+            weapon.enabled = false;
 
             stateMachine.OnStart((int) StateType.Idle);
         }
@@ -208,12 +210,6 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                // Hide
-                // if(Input.GetKeyDown(KeyCode.F))
-                // {
-                //     StateMachine.ChangeState((int) StateType.Hide);
-                // }
-
                 // Crouch
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
@@ -637,47 +633,99 @@ namespace StateManager
         }
 
 
-        // state attack
+        // state Attack
         private class StateAttack : StateBase
         {
+            private int phase = 0;        // 攻撃が何段目かのカウント
+            private bool comboInput = false;
+            private string[] animNames = { "first", "second", "third", "forth" };
+
+            // 入力受付の開始・終了 normalizedTime
+            private float comboStart = 0.4f;
+            private float comboEnd   = 0.8f;
+
             public override void OnStart()
             {
                 Debug.Log("start attack");
+                phase = 0;
+                comboInput = false;
+                Owner.weapon.enabled = true;
 
-                // 攻撃時に特殊攻撃状態か判定
-
-                // ステルスアタック
-                // バクスタよりも優先して発動させる
-                if(Owner.canStealthAttack)
-                {
-                    StateMachine.ChangeState((int) StateType.StealthAttack);
-                    return;
-                }
-                
-                // バックスタブ
-                if(Owner.Backstab())
-                {
-                    StateMachine.ChangeState((int) StateType.Backstab);
-                    return;
-                }
-
-                Owner.AA.StartAttackHit();
-                Owner.animationState.SetState("Jab", true);
+                StartAttackPhase();
             }
 
             public override void OnUpdate()
             {
-                // Idle
-                if(Owner.animationState.AnimtionFinish("Jab") > 1.01f){
+                string anim = animNames[phase];
+
+                // アニメ終了判定
+                if (Owner.animationState.AnimtionFinish(anim) > 1.0f)
+                {
                     Owner.AA.EndAttackHit();
-                    StateMachine.ChangeState((int) StateType.Idle);
+
+                    if (comboInput && phase < animNames.Length - 1)
+                    {
+                        comboInput = false;
+                        phase++;
+                        StartAttackPhase();
+                        return;
+                    }
+
+                    StateMachine.ChangeState((int)StateType.Idle);
                 }
             }
 
             public override void OnEnd()
             {
                 Owner.AA.EndAttackHit();
+                Owner.weapon.enabled = false;
                 Debug.Log("end attack");
+            }
+
+            /// <summary>
+            /// 各段の開始処理
+            /// </summary>
+            private void StartAttackPhase()
+            {
+                string anim = animNames[phase];
+                Debug.Log($"Attack Phase: {phase + 1}");
+
+                Owner.AA.StartAttackHit();
+                Owner.animationState.SetState(anim, true);
+
+                WaitForComboInput(anim).Forget();
+            }
+
+            /// <summary>
+            /// normalizedTime で入力を受け付けるタスク
+            /// </summary>
+            private async UniTaskVoid WaitForComboInput(string animName)
+            {
+                comboInput = false;
+
+                // アニメ再生が始まるまで待つ（normalizedTimeが取得できるようになるまで）
+                await UniTask.Yield();
+
+                while (true)
+                {
+                    float t = Owner.animationState.AnimtionFinish(animName);
+
+                    // アニメ終了したら強制終了
+                    if (t >= 1f)
+                        break;
+
+                    // 入力受付範囲に入ったら攻撃入力を監視
+                    if (t >= comboStart && t <= comboEnd)
+                    {
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            comboInput = true;
+                            return;
+                        }
+                    }
+
+                    await UniTask.Yield();
+                }
             }
         }
 
@@ -705,6 +753,7 @@ namespace StateManager
                     return;
                 }
 
+                Owner.weapon.enabled = true;
                 Owner.AA.StartAttackHit();
                 Owner.animationState.SetState("DashAttack", true);
             }
@@ -721,6 +770,7 @@ namespace StateManager
             public override void OnEnd()
             {
                 Owner.AA.EndAttackHit();
+                Owner.weapon.enabled = false;
                 Debug.Log("end dashAttack");
             }
         }
@@ -769,11 +819,11 @@ namespace StateManager
             {
                 if(canAnimationPlay)
                 {
-                    Owner.animationState.SetState("Jab", true);
+                    Owner.animationState.SetState("first", true);
                     canAnimationPlay = false;
                 }
 
-                if(Owner.animationState.AnimtionFinish("Jab") > 1f)
+                if(Owner.animationState.AnimtionFinish("first") > 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 
@@ -874,7 +924,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                Debug.Log("死んだ！！！！！！！！！！！！");
+                Debug.Log("やられてしまった！");
             }
 
             public override void OnEnd()
