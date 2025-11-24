@@ -647,6 +647,14 @@ namespace StateManager
             public override void OnStart()
             {
                 Debug.Log("start attack");
+
+                // ステルスアタック
+                if(Owner.canStealthAttack)
+                {
+                    StateMachine.ChangeState((int) StateType.StealthAttack);
+                    return;
+                }
+
                 phase = 0;
                 comboInput = false;
                 Owner.weapon.enabled = true;
@@ -797,20 +805,30 @@ namespace StateManager
                 Time.timeScale = 0f;
                 Owner.cutInUI.SetActive(true);
 
-                // この辺でプレイヤーを透明に
-                // Owner.transform.position = Owner.stealthAttackTarget.transform.position;
-
                 // カットイン時間待機
                 await UniTask.Delay(System.TimeSpan.FromSeconds(displayDuration), ignoreTimeScale: true);
 
                 Owner.cutInUI.SetActive(false);
                 Time.timeScale = 1f;
 
+                // プレイヤーを透明に
+                SkinnedMeshRenderer[] s_meshRenderers = 
+                    Owner.GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (SkinnedMeshRenderer renderer in s_meshRenderers)
+                    renderer.enabled = false;
+                // プレイヤーをエネミーの座標へワープ
+                Owner.transform.position = Owner.stealthAttackTarget.transform.position;
+                Owner.rb.velocity = Vector3.zero;
+
                 // エフェクトの生成
                 Instantiate(Owner.stealthAttackEffect, Owner.stealthAttackTarget.transform.position, Quaternion.identity);
                 Owner.stealthAttackTarget.GetComponent<StealthAttackable>().HaveStealthAttack();
                 // エフェクト再生時間待機
                 await UniTask.Delay(System.TimeSpan.FromSeconds(2.5f), ignoreTimeScale: true);
+
+
+                foreach (SkinnedMeshRenderer renderer in s_meshRenderers)
+                    renderer.enabled = true;
 
                 canAnimationPlay = true;
             }
@@ -819,11 +837,11 @@ namespace StateManager
             {
                 if(canAnimationPlay)
                 {
-                    Owner.animationState.SetState("first", true);
+                    Owner.animationState.SetState("Land", true);
                     canAnimationPlay = false;
                 }
 
-                if(Owner.animationState.AnimtionFinish("first") > 1f)
+                if(Owner.animationState.AnimtionFinish("Land") > 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 

@@ -15,7 +15,7 @@ C:/Users/arcsa/Unity/PECO
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-49338
+57192
 Successfully changed project path to: C:/Users/arcsa/Unity/PECO
 C:/Users/arcsa/Unity/PECO
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
@@ -49,17 +49,15 @@ C:/Users/arcsa/Unity/PECO
     "memorysetup-temp-allocator-size-cloud-worker=32768"
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gfx=262144"
-Player connection [11128]  Target information:
+Player connection [4988]  Target information:
 
-Player connection [11128]  * "[IP] 172.23.80.1 [Port] 0 [Flags] 2 [Guid] 912260592 [EditorId] 912260592 [Version] 1048832 [Id] WindowsEditor(7,tawawa) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+Player connection [4988]  * "[IP] 192.168.13.150 [Port] 0 [Flags] 2 [Guid] 3170178614 [EditorId] 3170178614 [Version] 1048832 [Id] WindowsEditor(7,tawawa) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
 
-Player connection [11128]  * "[IP] 192.168.11.5 [Port] 0 [Flags] 2 [Guid] 912260592 [EditorId] 912260592 [Version] 1048832 [Id] WindowsEditor(7,tawawa) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
-
-Player connection [11128] Host joined multi-casting on [225.0.0.222:54997]...
-Player connection [11128] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Player connection [4988] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [4988] Host joined alternative multi-casting on [225.0.0.222:34997]...
 Input System module state changed to: Initialized.
 [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
-Refreshing native plugins compatible for Editor in 14.64 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 16.99 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2022.3.59f1 (630718f645a5)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/Resources/UnitySubsystems
@@ -75,44 +73,44 @@ Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56864
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56008
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2022.3.59f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.007834 seconds.
-- Loaded All Assemblies, in  0.398 seconds
+Registered in 0.011503 seconds.
+- Loaded All Assemblies, in  0.630 seconds
 Native extension for WindowsStandalone target not found
 Mono: successfully reloaded assembly
-- Finished resetting the current domain, in  0.368 seconds
-Domain Reload Profiling: 765ms
-	BeginReloadAssembly (108ms)
+- Finished resetting the current domain, in  0.444 seconds
+Domain Reload Profiling: 1072ms
+	BeginReloadAssembly (210ms)
 		ExecutionOrderSort (0ms)
 		DisableScriptedObjects (0ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
-		CreateAndSetChildDomain (1ms)
-	RebuildCommonClasses (37ms)
-	RebuildNativeTypeToScriptingClass (14ms)
-	initialDomainReloadingComplete (61ms)
-	LoadAllAssembliesAndSetupDomain (176ms)
-		LoadAssemblies (106ms)
+		CreateAndSetChildDomain (2ms)
+	RebuildCommonClasses (73ms)
+	RebuildNativeTypeToScriptingClass (18ms)
+	initialDomainReloadingComplete (95ms)
+	LoadAllAssembliesAndSetupDomain (231ms)
+		LoadAssemblies (205ms)
 		RebuildTransferFunctionScriptingTraits (0ms)
-		AnalyzeDomain (174ms)
-			TypeCache.Refresh (172ms)
-				TypeCache.ScanAssembly (156ms)
-			ScanForSourceGeneratedMonoScriptInfo (0ms)
+		AnalyzeDomain (228ms)
+			TypeCache.Refresh (225ms)
+				TypeCache.ScanAssembly (204ms)
+			ScanForSourceGeneratedMonoScriptInfo (1ms)
 			ResolveRequiredComponents (1ms)
-	FinalizeReload (369ms)
+	FinalizeReload (445ms)
 		ReleaseScriptCaches (0ms)
 		RebuildScriptCaches (0ms)
-		SetupLoadedEditorAssemblies (305ms)
+		SetupLoadedEditorAssemblies (368ms)
 			LogAssemblyErrors (0ms)
-			InitializePlatformSupportModulesInManaged (12ms)
-			SetLoadedEditorAssemblies (10ms)
+			InitializePlatformSupportModulesInManaged (13ms)
+			SetLoadedEditorAssemblies (11ms)
 			RefreshPlugins (0ms)
 			BeforeProcessingInitializeOnLoad (3ms)
-			ProcessInitializeOnLoadAttributes (211ms)
-			ProcessInitializeOnLoadMethodAttributes (70ms)
+			ProcessInitializeOnLoadAttributes (259ms)
+			ProcessInitializeOnLoadMethodAttributes (82ms)
 			AfterProcessingInitializeOnLoad (0ms)
 			EditorAssembliesLoaded (0ms)
 		ExecutionOrderSort2 (0ms)
@@ -121,50 +119,50 @@ Domain Reload Profiling: 765ms
 Worker process is ready to serve import requests
 Caller must complete domain reload
 Begin MonoManager ReloadAssembly
-- Loaded All Assemblies, in  0.743 seconds
+- Loaded All Assemblies, in  1.164 seconds
 Native extension for WindowsStandalone target not found
 Mono: successfully reloaded assembly
-- Finished resetting the current domain, in  0.696 seconds
-Domain Reload Profiling: 1437ms
-	BeginReloadAssembly (139ms)
+- Finished resetting the current domain, in  1.181 seconds
+Domain Reload Profiling: 2341ms
+	BeginReloadAssembly (210ms)
 		ExecutionOrderSort (0ms)
-		DisableScriptedObjects (6ms)
+		DisableScriptedObjects (9ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
-		CreateAndSetChildDomain (27ms)
-	RebuildCommonClasses (26ms)
-	RebuildNativeTypeToScriptingClass (8ms)
-	initialDomainReloadingComplete (36ms)
-	LoadAllAssembliesAndSetupDomain (530ms)
-		LoadAssemblies (356ms)
+		CreateAndSetChildDomain (34ms)
+	RebuildCommonClasses (45ms)
+	RebuildNativeTypeToScriptingClass (17ms)
+	initialDomainReloadingComplete (65ms)
+	LoadAllAssembliesAndSetupDomain (823ms)
+		LoadAssemblies (525ms)
 		RebuildTransferFunctionScriptingTraits (0ms)
-		AnalyzeDomain (244ms)
-			TypeCache.Refresh (200ms)
-				TypeCache.ScanAssembly (184ms)
-			ScanForSourceGeneratedMonoScriptInfo (28ms)
-			ResolveRequiredComponents (13ms)
-	FinalizeReload (696ms)
+		AnalyzeDomain (419ms)
+			TypeCache.Refresh (352ms)
+				TypeCache.ScanAssembly (325ms)
+			ScanForSourceGeneratedMonoScriptInfo (47ms)
+			ResolveRequiredComponents (18ms)
+	FinalizeReload (1181ms)
 		ReleaseScriptCaches (0ms)
 		RebuildScriptCaches (0ms)
-		SetupLoadedEditorAssemblies (551ms)
+		SetupLoadedEditorAssemblies (923ms)
 			LogAssemblyErrors (0ms)
-			InitializePlatformSupportModulesInManaged (5ms)
-			SetLoadedEditorAssemblies (3ms)
+			InitializePlatformSupportModulesInManaged (8ms)
+			SetLoadedEditorAssemblies (6ms)
 			RefreshPlugins (0ms)
-			BeforeProcessingInitializeOnLoad (90ms)
-			ProcessInitializeOnLoadAttributes (357ms)
-			ProcessInitializeOnLoadMethodAttributes (92ms)
-			AfterProcessingInitializeOnLoad (5ms)
+			BeforeProcessingInitializeOnLoad (129ms)
+			ProcessInitializeOnLoadAttributes (618ms)
+			ProcessInitializeOnLoadMethodAttributes (151ms)
+			AfterProcessingInitializeOnLoad (10ms)
 			EditorAssembliesLoaded (0ms)
 		ExecutionOrderSort2 (0ms)
-		AwakeInstancesAfterBackupRestoration (6ms)
+		AwakeInstancesAfterBackupRestoration (13ms)
 Launched and connected shader compiler UnityShaderCompiler.exe after 0.07 seconds
-Refreshing native plugins compatible for Editor in 5.98 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 7.36 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 5935 Unused Serialized files (Serialized files now loaded: 0)
-Unloading 86 unused Assets / (10.3 MB). Loaded Objects now: 6368.
-Memory consumption went from 318.1 MB to 307.8 MB.
-Total: 9.419800 ms (FindLiveObjects: 0.721600 ms CreateObjectMapping: 0.198000 ms MarkObjects: 4.142300 ms  DeleteObjects: 4.356300 ms)
+Unloading 5934 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 86 unused Assets / (10.4 MB). Loaded Objects now: 6369.
+Memory consumption went from 318.7 MB to 308.3 MB.
+Total: 10.142000 ms (FindLiveObjects: 1.057500 ms CreateObjectMapping: 0.319200 ms MarkObjects: 4.143500 ms  DeleteObjects: 4.620300 ms)
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
@@ -182,34 +180,174 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  Time since last request: 554709.412444 seconds.
-  path: Assets/Prefabs/Boxes/SM_WoodBox_3.prefab
-  artifactKey: Guid(867e4c47bf8b57d488a3e60bab968923) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Prefabs/Boxes/SM_WoodBox_3.prefab using Guid(867e4c47bf8b57d488a3e60bab968923) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+  Time since last request: 34177.748862 seconds.
+  path: Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_3.mat
+  artifactKey: Guid(7ce693547ae759e4c95ee9c785e97232) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_3.mat using Guid(7ce693547ae759e4c95ee9c785e97232) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
 [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
- -> (artifact id: '543822c3dd97c20e263fa6f2cb5dc633') in 0.097477 seconds
+ -> (artifact id: 'bc237ecc7a61b984419abc2fe230c770') in 0.431009 seconds
 Number of updated asset objects reloaded before import = 0
-Number of asset objects unloaded after import = 14
+Number of asset objects unloaded after import = 2
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000053 seconds.
-  path: Assets/Prefabs/Boxes/SM_WoodBox_4.prefab
-  artifactKey: Guid(a89288d05164ef34da18b38197719a04) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Prefabs/Boxes/SM_WoodBox_4.prefab using Guid(a89288d05164ef34da18b38197719a04) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+  Time since last request: 0.000047 seconds.
+  path: Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_2.mat
+  artifactKey: Guid(86a87aefd89d39f48b3caafb4347b922) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_2.mat using Guid(86a87aefd89d39f48b3caafb4347b922) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
 [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
- -> (artifact id: '21d10d170379c93daac7deb56ea5311f') in 0.021666 seconds
+ -> (artifact id: 'e04819720742ee979334d0acdc031e48') in 0.033372 seconds
 Number of updated asset objects reloaded before import = 0
-Number of asset objects unloaded after import = 16
+Number of asset objects unloaded after import = 2
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000034 seconds.
-  path: Assets/Prefabs/Boxes/SM_Coil.prefab
-  artifactKey: Guid(706810835ac00d944b34a4fff52b0897) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Prefabs/Boxes/SM_Coil.prefab using Guid(706810835ac00d944b34a4fff52b0897) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+  Time since last request: 0.000032 seconds.
+  path: Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_0.mat
+  artifactKey: Guid(d02941c1bdfb033478a0c8b66f4b4cf8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Models/Civilian_Buildings/Materials/Roof_0.mat using Guid(d02941c1bdfb033478a0c8b66f4b4cf8) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
 [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
- -> (artifact id: '75760cb2b4983cb84d0c061a77980005') in 0.041410 seconds
+ -> (artifact id: 'd4d8a225dec978b169b05b9f1a309a90') in 0.030368 seconds
 Number of updated asset objects reloaded before import = 0
-Number of asset objects unloaded after import = 14
+Number of asset objects unloaded after import = 2
+========================================================================
+Received Import Request.
+  Time since last request: 832.338922 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_bridge_4_a.prefab
+  artifactKey: Guid(0f850d0fac04ede4ea27e49385eb7027) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_bridge_4_a.prefab using Guid(0f850d0fac04ede4ea27e49385eb7027) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: 'cb13d0034b5cbfb70cb205d8c30401ae') in 0.117390 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 10
+========================================================================
+Received Import Request.
+  Time since last request: 0.000054 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_bridge_4_c.prefab
+  artifactKey: Guid(0f345181e86804249a0fb3f87ec033e2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_bridge_4_c.prefab using Guid(0f345181e86804249a0fb3f87ec033e2) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: 'c4ccbead594710f32d860df2f444e8c8') in 0.051979 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 10
+========================================================================
+Received Import Request.
+  Time since last request: 0.844801 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_01.prefab
+  artifactKey: Guid(f0894d3a3479c634485553b098c987cb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_01.prefab using Guid(f0894d3a3479c634485553b098c987cb) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '24c45678e40b09e6cca96b8231fbde5d') in 0.192237 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 13
+========================================================================
+Received Import Request.
+  Time since last request: 0.000045 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_04.prefab
+  artifactKey: Guid(2ae16399f9f71cd49a385e59aa119a58) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_04.prefab using Guid(2ae16399f9f71cd49a385e59aa119a58) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '8f032e3321502cc445f56dfcb6409e81') in 0.065492 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 13
+========================================================================
+Received Import Request.
+  Time since last request: 0.113299 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_06.prefab
+  artifactKey: Guid(2d336554bc95f6942a90d88547aeb1b8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_06.prefab using Guid(2d336554bc95f6942a90d88547aeb1b8) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '3b0a7e7fb076bda97acd2cd09566e746') in 0.055058 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 13
+========================================================================
+Received Import Request.
+  Time since last request: 0.000047 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_09.prefab
+  artifactKey: Guid(d7fd44a9ba1363345ba0969019d4c1c9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/civilian_house_09.prefab using Guid(d7fd44a9ba1363345ba0969019d4c1c9) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '2db1455934de926fafa2359bd56fac06') in 0.082111 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 13
+========================================================================
+Received Import Request.
+  Time since last request: 2.568122 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/tent_a.prefab
+  artifactKey: Guid(b03d0fc686eaa7342bab75d9a173417c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/tent_a.prefab using Guid(b03d0fc686eaa7342bab75d9a173417c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: 'd4fae8f8cc02db995a0faec4c86e9e3f') in 0.058912 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 12
+========================================================================
+Received Import Request.
+  Time since last request: 0.000039 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/tent_c.prefab
+  artifactKey: Guid(8bee2cb511be01b4486e91bbc5048ab4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/tent_c.prefab using Guid(8bee2cb511be01b4486e91bbc5048ab4) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '7109fb9c091daec0f6cc24f940a39681') in 0.108100 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 10
+========================================================================
+Received Import Request.
+  Time since last request: 0.689681 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_city_inner.prefab
+  artifactKey: Guid(36888e805d00a0b4b82757e3692ede9b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_city_inner.prefab using Guid(36888e805d00a0b4b82757e3692ede9b) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '05dc917eeceeb54bfd311f4edae19227') in 0.050195 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
+========================================================================
+Received Import Request.
+  Time since last request: 0.000084 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_standard.prefab
+  artifactKey: Guid(429b354257073ae40ad51c100a60a6be) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_standard.prefab using Guid(429b354257073ae40ad51c100a60a6be) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '5d3d0d84fa73e42ebb3f19d862e0563d') in 0.036171 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
+========================================================================
+Received Import Request.
+  Time since last request: 1.654975 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_08.prefab
+  artifactKey: Guid(ffbc74fb0bbcfde41861fd2317cf65e7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_08.prefab using Guid(ffbc74fb0bbcfde41861fd2317cf65e7) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '327edaa97c6aa7658363472ce7a3009e') in 0.043507 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
+========================================================================
+Received Import Request.
+  Time since last request: 0.000038 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_07.prefab
+  artifactKey: Guid(dee1f1bc8c892874aac53e339eb2157c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_07.prefab using Guid(dee1f1bc8c892874aac53e339eb2157c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: 'f96249645cc4550ef73a4fc90781ae73') in 0.051962 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
+========================================================================
+Received Import Request.
+  Time since last request: 0.893684 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_02.prefab
+  artifactKey: Guid(3306dfac563d1fd4695f3019b0b7d041) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/terrain_02.prefab using Guid(3306dfac563d1fd4695f3019b0b7d041) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: '07bffa12fd22e1615893a711b69b1f23') in 0.042671 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
+========================================================================
+Received Import Request.
+  Time since last request: 0.266765 seconds.
+  path: Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/sky.prefab
+  artifactKey: Guid(fc723164fcb3394489548dfd87d02024) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Polylised - Medieval Desert City/Prefabs/prefab_terrain/sky.prefab using Guid(fc723164fcb3394489548dfd87d02024) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 12 workers.
+ -> (artifact id: 'b5c8594745ca850a8fde9eaef7903e7a') in 0.134308 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 9
 Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
 TcpMessagingSession - receive error: operation aborted. errorcode: 995, details: スレッドの終了またはアプリケーションの要求によって、I/O 処理は中止されました。
 AssetImportWorker is now disconnected from the server

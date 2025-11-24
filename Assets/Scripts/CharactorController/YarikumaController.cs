@@ -69,15 +69,20 @@ namespace StateManager
         void Update()
         {
             stateMachine.OnUpdate();
-            if(enemyStatus.GetHp <= 0){
-                int layer = LayerMask.NameToLayer("Dead");
-                this.gameObject.layer = layer;
-                stateMachine.ChangeState((int) StateType.Death);
-            }
 
             if(enemyStatus.GetBackstabed){
                 animationState.SetState("Backstabed", true);
                 stateMachine.ChangeState((int) StateType.Backstabed);
+            }
+        }
+
+        private void CheckDeath()
+        {
+            if(enemyStatus.GetHp <= 0)
+            {
+                int layer = LayerMask.NameToLayer("Dead");
+                this.gameObject.layer = layer;
+                stateMachine.ChangeState((int) StateType.Death);
             }
         }
 
@@ -457,6 +462,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.CheckDeath();
+
                 if(Owner.animationState.AnimtionFinish("Damage") >= 1f){
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
@@ -494,6 +501,11 @@ namespace StateManager
                 Owner.enemyStatus.m_hp = 0;
             }
 
+            public override void OnUpdate()
+            {
+                Owner.CheckDeath();
+            }
+
             public override void OnEnd()
             {
                 Debug.Log("end StealthAttacked");
@@ -517,6 +529,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.CheckDeath();
+
                 if(Owner.animationState.AnimtionFinish("Backstabed") >= 1f){
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
