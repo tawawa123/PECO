@@ -38,6 +38,7 @@ namespace StateManager
         private enum StateType
         {
             Idle,
+            UIControll,
 
             // Move   
             Walk,
@@ -57,6 +58,8 @@ namespace StateManager
             StealthAttack,
             DashAttack,
             Damage,
+            Parry,
+            Guard,
 
             // 死亡
             GameOver,
@@ -84,6 +87,7 @@ namespace StateManager
             // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<PlayerController>(this);
             stateMachine.Add<StateIdle>((int) StateType.Idle);                      // Idle
+            stateMachine.Add<StateUIControll>((int) StateType.UIControll);          // UI操作時の処理
             stateMachine.Add<StateWalk>((int) StateType.Walk);                      // 通常歩行
             stateMachine.Add<StateRun>((int) StateType.Run);                        // ダッシュ
             stateMachine.Add<StateJump>((int) StateType.Jump);                      // ジャンプ
@@ -99,6 +103,8 @@ namespace StateManager
             stateMachine.Add<StateStealthAttack>((int) StateType.StealthAttack);    // ステルスアタック
             stateMachine.Add<StateDashAttack>((int) StateType.DashAttack);          // ダッシュ派生攻撃
             stateMachine.Add<StateDamage>((int) StateType.Damage);                  // ダメージ処理
+            stateMachine.Add<StateParry>((int) StateType.Parry);                    // パリィ処理
+            stateMachine.Add<StateGuard>((int) StateType.Guard);                    // ガード処理
             stateMachine.Add<StateGameOver>((int) StateType.GameOver);              // 死亡時処理
 
             AA = this.GetComponentInChildren<AttackArea>();
@@ -112,6 +118,8 @@ namespace StateManager
         void Update() 
         {
             // LockForEnemy();
+
+            Debug.Log(canStealthAttack);
 
             // 着地判定
             isGrounded = Physics.CheckSphere(transform.position, isGroundedSize, LayerMask.GetMask("Ground"));
@@ -239,6 +247,32 @@ namespace StateManager
                 {
                     StateMachine.ChangeState((int) StateType.Jump);
                 }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Idle");
+            }
+        }
+
+
+        public void ChangeUIControlleState()
+        {
+            stateMachine.ChangeState((int) StateType.UIControll);
+        }
+        // UI操作時の処理
+        private class StateUIControll : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Idle");
+
+                Owner.animationState.SetState("Idle", true);
+            }
+
+            public override void OnUpdate()
+            {
+                // 何もしない
             }
 
             public override void OnEnd()
@@ -907,6 +941,64 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end Damage");
+            }
+        }
+
+
+        public void ChangeParryState()
+        {
+            stateMachine.ChangeState((int) StateType.Parry);
+        }
+        // パリィ成功時の処理
+        private class StateParry : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Parry");
+
+                Owner.animationState.SetState("Parry", true);
+            }
+
+            public override void OnUpdate()
+            {
+                if(Owner.animationState.AnimtionFinish("Parry") > 1.0f)
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Parry");
+            }
+        }
+
+
+        public void ChangeGuardState()
+        {
+            stateMachine.ChangeState((int) StateType.Guard);
+        }
+        // ガード時の処理
+        private class StateGuard : StateBase
+        {
+            public override void OnStart()
+            {
+                Debug.Log("start Guard");
+
+                Owner.animationState.SetState("Guard", true);
+            }
+
+            public override void OnUpdate()
+            {
+                if (Input.GetMouseButtonUp(1))
+                {
+                    StateMachine.ChangeState((int) StateType.Idle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                Debug.Log("end Guard");
             }
         }
 

@@ -25,6 +25,7 @@ namespace StateManager
             Damage,
             Backstabed,
             StealthAttacked,
+            Parryed,
             Death,
         }
 
@@ -57,6 +58,7 @@ namespace StateManager
             stateMachine.Add<StateDamage>((int) StateType.Damage);
             stateMachine.Add<StateBackstabed>((int) StateType.Backstabed);
             stateMachine.Add<StateStealthAttacked>((int) StateType.StealthAttacked);
+            stateMachine.Add<StateParryed>((int) StateType.Parryed);
             stateMachine.Add<StateDeath>((int) StateType.Death);
 
             stateMachine.OnStart((int) StateType.Idle);
@@ -429,7 +431,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                // 攻撃アニメーションが終了したらButtleに遷移
+                // 攻撃アニメーションが終了したらBattleに遷移
                 if(Owner.animationState.AnimtionFinish("Attack") >= 1f){
                     Owner.AA.EndAttackHit();
                     StateMachine.ChangeState((int) StateType.Battle);
@@ -492,10 +494,10 @@ namespace StateManager
                 cts = new CancellationTokenSource();
                 Owner.animationState.SetState("StealthAttacked", true);
 
-                DelayDeth(cts.Token).Forget();
+                DelayDeath(cts.Token).Forget();
             }
 
-            private async UniTask DelayDeth(CancellationToken token)
+            private async UniTask DelayDeath(CancellationToken token)
             {
                 await UniTask.Delay(System.TimeSpan.FromSeconds(2.5f));
                 Owner.enemyStatus.m_hp = 0;
@@ -509,6 +511,85 @@ namespace StateManager
             public override void OnEnd()
             {
                 Debug.Log("end StealthAttacked");
+            }
+        }
+
+        public void ChangeParryedState(){
+            stateMachine.ChangeState((int) StateType.Parryed);
+        }
+        private class StateParryed : StateBase
+        {
+            // CancellationTokenSourceはクラスレベルで管理
+            private CancellationTokenSource cts;
+            private PlayerController playerController;
+
+            // パリィ硬直時間
+            private const float PARRY_STUN_DURATION = 2.5f; 
+
+            public override void OnStart()
+            {
+                Debug.Log("start Parryed");
+                
+                playerController = Owner.player.GetComponent<PlayerController>();
+                // 既存のトークンを破棄し、新しく作成
+                cts?.Dispose();
+                cts = new CancellationTokenSource();
+                
+                // アニメーションステートを設定
+                Owner.animationState.SetState("Parryed", true); 
+                // 今スタンしているかどうか
+                Owner.enemyStatus.m_stun = false;
+
+                // 非同期処理を開始
+                WaitParryed(cts.Token).Forget();
+            }
+
+            private async UniTask WaitParryed(CancellationToken token)
+            {
+                // 2. 待機時間が始まった時、プレイヤーコントローラー側に用意されているフラグを参照してtrueにする
+                playerController.CanStealthAttack(true);
+                Debug.Log("プレイヤーフラグをON: 追撃可能状態");
+                
+                // 1. パリィされた際に、2.5秒程度の待機時間を設ける
+                // .SuppressCancellationThrow() を使用し、例外を発生させずにキャンセルされたかを取得
+                bool isCanceled = await UniTask.Delay(
+                    System.TimeSpan.FromSeconds(PARRY_STUN_DURATION),
+                    cancellationToken: token
+                ).SuppressCancellationThrow();
+
+                // 共通処理: プレイヤーのフラグを解除
+                playerController.CanStealthAttack(false);
+                Debug.Log("プレイヤーフラグをOFF: 追撃終了");
+
+                if (isCanceled)
+                {
+                    // 4. 待機時間中に外部からのキャンセルがあった場合
+                    Debug.Log("外部からのキャンセル（例: 追撃ヒット）により、硬直を即時終了");
+                    Owner.enemyStatus.m_stun = true;
+                    // キャンセルされた場合、このStateのOnEnd()が実行されるため、ここでは特に状態遷移は行わない
+                }
+                else
+                {
+                    // 3. 待機時間中に何もなかったのであれば（時間切れ）
+                    Debug.Log("硬直時間終了。通常戦闘状態に戻ります。");
+                    
+                    // 通常の状態に戻る
+                    Owner.enemyStatus.m_stun = true;
+                    StateMachine.ChangeState((int) StateType.Battle);
+                }
+            }
+
+            public override void OnEnd()
+            {
+                // 4. 待機時間中に外部からのキャンセルがあった場合 (OnEndが呼ばれるのは、外部でcts.Cancel()が呼ばれた場合)
+                // 待機時間をリセットする = キャンセル処理を行う
+                cts?.Cancel();
+                cts?.Dispose();
+                cts = null;
+
+                // 今スタンしているかどうか
+                Owner.enemyStatus.m_stun = true;
+                Debug.Log("end Parryed state.");
             }
         }
 

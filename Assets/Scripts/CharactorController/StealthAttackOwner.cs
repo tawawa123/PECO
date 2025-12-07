@@ -50,7 +50,7 @@ public class StealthAttackOwner : MonoBehaviour
         
         // 敵がプレイヤーに気づいていたら終了
         var enemyStatus = target.GetComponent<EnemyStatus>();
-        if (enemyStatus.GetVigilancePoint == 100f){
+        if (enemyStatus.GetVigilancePoint == 100f && enemyStatus.m_stun){
             targetUI.gameObject.SetActive(false);
             playerController.CanStealthAttack(false);
             return;
