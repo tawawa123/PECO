@@ -11,8 +11,8 @@ public class Destination : MonoBehaviour
     [SerializeField] private Transform[] targets;
     [SerializeField] private int order = 0;
 
-    public enum Route {inOrder, random}
-    public Route route;
+    private enum Route {inOrder, random}
+    private Route route;
 
 
     void Start()

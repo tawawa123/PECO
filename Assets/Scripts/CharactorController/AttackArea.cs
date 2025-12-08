@@ -1,71 +1,133 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using StateManager;
 
 public class AttackArea : MonoBehaviour
 {
     [SerializeField] private int AttackDamage;
     private Collider attackAreaCollider = null;
 
-    // 攻撃したした回数　多段ヒット防止用
-    int attackCount = 0;
+    // 攻撃した回数 (多段ヒット防止用)
+    private int attackCount = 0;
 
     public void Start()
     {
         SetAttackArea();
     }
-
-    // 武器の付け替えなどのときに、コライダーを再取得する
     public void SetAttackArea()
     {
         attackAreaCollider = GetComponent<Collider>();
         attackAreaCollider.enabled = false;
     }
-
-    // 攻撃モーション時に受け取ってコライダを有効にする
     public void StartAttackHit()
     {
-        attackCount++;
-        attackAreaCollider.enabled = true;        
+        attackCount = 0; 
+        attackAreaCollider.enabled = true; 
     }
-
-    // アニメーションイベントのEndAttackHitを受け取ってコライダを無効にする
     public void EndAttackHit()
     {
         attackCount = 0;
         attackAreaCollider.enabled = false;
     }
 
+
     private void OnTriggerEnter (Collider other)
     {
-        Debug.Log(attackCount);
-        if(attackCount < 2){
-            switch(LayerMask.LayerToName(other.gameObject.layer))
+        // 多段ヒット防止
+        if(attackCount >= 1)
+            return;
+
+        switch(LayerMask.LayerToName(other.gameObject.layer))
+        {
+            case "PlayerHit":
+                // ParryController
+                PlayerParryController pParryController = other.gameObject.GetComponentInParent<PlayerParryController>();
+                
+                // パリィ成功時の処理
+                if (pParryController != null)
+                {   
+                    if (pParryController.IsParryActive)
+                    {
+                        // パリィ成功判定
+                        pParryController.NotifyParrySuccess();
+                        ProcessParried(other.gameObject);
+                        
+                        return;
+                    }
+                    // ガード成功判定
+                    else if (pParryController.IsGuarding)
+                    {                        
+                        ProcessGuardSuccess(other.gameObject);
+                        ProcessParried(other.gameObject); 
+                        
+                        return;
+                    }
+                }
+                
+                // ヒット判定 (パリィもガードもしていない場合)
+                ProcessHit(other, "PlayerStatus", "Damagable");
+                break;
+
+            // プレイヤーが敵に攻撃した場合の処理
+            case "EnemyHit":
+                ProcessHit(other, "EnemyStatus", "Damagable");
+                break;
+        }
+    }
+    
+    // パリィ・ガード成功時の処理
+    private void ProcessParried(GameObject target)
+    {
+        // 敵のアニメーションを硬直させたり、武器の軌道をリセットしたりする処理をここに追加
+        Debug.Log("🛡️ 攻撃がパリィ/ガードされました！");
+        var controller = this.GetComponentInParent<YarikumaController>();
+        controller.ChangeParryedState();
+        EndAttackHit(); // コライダーを無効化して多段ヒット防止
+    }
+
+    // ガード成功時のプレイヤー側の処理
+    private void ProcessGuardSuccess(GameObject target)
+    {
+        // プレイヤーのスタミナ消費やノックバック処理などを呼び出す
+        Debug.Log("✅ ガード成功！");
+        // 例: target.GetComponentInParent<PlayerStatus>().ConsumeStamina(guardCost);
+    }
+    
+    // ヒット時の処理
+    private void ProcessHit(Collider other, string statusType, string damagableType)
+    {
+        attackCount++;
+
+        if (statusType == "PlayerStatus")
+        {
+            // PlayerHit
+            PlayerStatus pStatus = other.gameObject.GetComponentInParent<PlayerStatus>();
+            if (pStatus != null)
             {
-                case "PlayerHit":
-                    PlayerStatus pStatus = other.gameObject.GetComponent<PlayerStatus>();
-                    pStatus.m_hp -= AttackDamage;
-
-                    var damagetarget1 = other.gameObject.GetComponent<Damagable>();
-                    
-                    if (damagetarget1 != null){
-                        other.gameObject.GetComponent<Damagable>().AddDamage(AttackDamage);
-                        EndAttackHit();
-                    }
-                    break;
-
-                case "EnemyHit":
-                    EnemyStatus eStatus = other.gameObject.GetComponent<EnemyStatus>();
-                    eStatus.m_hp -= AttackDamage;
-
-                    var damagetarget2 = other.gameObject.GetComponent<Damagable>();
-                    
-                    if (damagetarget2 != null){
-                        other.gameObject.GetComponent<Damagable>().AddDamage(AttackDamage);
-                        EndAttackHit();
-                    }
-                    break;
+                pStatus.m_hp -= AttackDamage;
             }
+        }
+        else if (statusType == "EnemyStatus")
+        {
+            // EnemyHit
+            EnemyStatus eStatus = other.gameObject.GetComponent<EnemyStatus>();
+            if (eStatus != null)
+            {
+                eStatus.m_hp -= AttackDamage;
+            }
+        }
+        
+        // インターフェイス呼び出し
+        var damagetarget = (statusType == "PlayerStatus") 
+            ? other.gameObject.GetComponentInParent<Damagable>()
+            : other.gameObject.GetComponent<Damagable>();
+        
+        if (damagetarget != null)
+        {
+            damagetarget.AddDamage(AttackDamage);
+            // 攻撃終了
+            EndAttackHit();
         }
     }
 }
