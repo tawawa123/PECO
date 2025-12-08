@@ -360,19 +360,26 @@ namespace StateManager
             Vector3 posDelta;
             Vector3 destination;
             float targetAngle;
+            float targetRadius = 3.0f;
+
+            private Vector3 lastPosition;       // 前回のフレームでの位置
+            private float stuckTimer = 0f;      // 立ち往生を検出するためのタイマー
+            private const float STUCK_THRESHOLD = 0.1f; // 停止とみなす移動量の閾値
+            private const float STUCK_TIME_LIMIT = 2.0f; // 立ち往生と判断する時間 (秒)
 
             public override void OnStart()
             {
                 Owner.animationState.SetState("Combat", true);
 
+                Owner.navAgent.speed = 1;
                 posDelta = Vector3.zero;
 
                 // プレイヤーの周囲を動くための目的地設定
                 Transform playerPos = Owner.player.transform;
-                float centerAngle = Mathf.Atan2(playerPos.forward.z, playerPos.forward.x) * Mathf.Rad2Deg;
-                float randomOffset = Random.Range(-60f, 60f); // ±60°の範囲
-                targetAngle = centerAngle + randomOffset;
+                float targetAngle = Mathf.Atan2(playerPos.forward.z, playerPos.forward.x) * Mathf.Rad2Deg;
 
+                // 移動先を決定
+                SetNewDestination();
                 Owner.navAgent.angularSpeed = 0;
 
                 Debug.Log("start Battle");
@@ -382,19 +389,68 @@ namespace StateManager
             {
                 posDelta = Owner.player.transform.position - Owner.transform.position;
 
-                if(Mathf.Abs(posDelta.magnitude) >= 15f){
+                if(Mathf.Abs(posDelta.magnitude) >= 15f)
+                {
                     Owner.navAgent.angularSpeed = 120;
                     StateMachine.ChangeState((int) StateType.Chase);
                 }
 
-                Vector3 destination = GetPointOnArc(Owner.player.transform.position, 3.0f, targetAngle);
+                // 立ち往生検出
+                float movementSinceLastFrame = (Owner.transform.position - lastPosition).sqrMagnitude;
+                
+                if (movementSinceLastFrame < STUCK_THRESHOLD * STUCK_THRESHOLD)
+                {
+                    // ほとんど動いていない場合、タイマーを加算
+                    stuckTimer += Time.deltaTime;
+                    
+                    if (stuckTimer >= STUCK_TIME_LIMIT)
+                    {
+                        Debug.Log("立ち往生を検出！移動パスを再計算します。");
+                        
+                        // 立ち往生と判断された場合、新しい目的地を設定
+                        SetNewDestination(); 
+                        stuckTimer = 0f;
+                    }
+                }
+                else
+                {
+                    // 正常に動いている場合、タイマーをリセット
+                    stuckTimer = 0f;
+                }
+                lastPosition = Owner.transform.position;
+
+
                 Owner.navAgent.SetDestination(destination);
 
-                if(Mathf.Abs((Owner.transform.position - destination).magnitude) <= 0.5f){
-                    StateMachine.ChangeState((int) StateType.Attack);
+                // 確率で行動選択
+                /// <summury>
+                /// 80% - 攻撃に遷移
+                /// 20% - 移動地点を再度指定
+                /// <summury>
+                if(Mathf.Abs((Owner.transform.position - destination).magnitude) <= 0.5f)
+                {
+                    int choice = Random.Range(0, 100);
+                    Debug.Log(choice);
+                    
+                    if (choice < 60) // 60%
+                    {
+                        // 攻撃に遷移
+                        StateMachine.ChangeState((int) StateType.Attack);
+                    }
+                    //else if (choice < 80) // 60% ~ 80%
+                    //{
+                        // 目の前に花火みたいなんを出しながら後退
+                        // StateMachine.ChangeState((int) StateType.Dodge);
+                    //}
+                    else // 80% ~ 100%
+                    {   
+                        // 目的地を再設定
+                        SetNewDestination();
+                        Owner.navAgent.SetDestination(destination);
+                    }
                 }
 
-                // プレイヤーの位置とこの敵の位置から角度を求める。
+                // プレイヤーの位置と敵の位置から角度を求める
                 var qrot = Quaternion.LookRotation(Owner.player.transform.position - Owner.transform.position);
                 Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, qrot, Time.time * 2);
             }
@@ -407,13 +463,54 @@ namespace StateManager
             // プレイヤーを中心にした円弧上の座標を取得
             public Vector3 GetPointOnArc(Vector3 playerPos, float radius, float angleDeg)
             {
+                // 移動先を±60°の範囲でランダムに
+                float randomOffset = Random.Range(-60f, 60f);
+
                 // 角度をラジアンに変換
-                float rad = angleDeg * Mathf.Deg2Rad;
-                // 水平方向 (XZ平面) のみ
+                float rad = (angleDeg + randomOffset) * Mathf.Deg2Rad;
+                // 水平方向のみ
                 float x = playerPos.x + radius * Mathf.Cos(rad);
                 float z = playerPos.z + radius * Mathf.Sin(rad);
 
                 return new Vector3(x, playerPos.y, z);
+            }
+
+            private void SetNewDestination()
+            {
+                Transform playerPos = Owner.player.transform;
+                float centerAngle = Mathf.Atan2(playerPos.forward.z, playerPos.forward.x) * Mathf.Rad2Deg;
+                
+                // 最大試行回数を設定
+                const int MAX_ATTEMPTS = 5; 
+                
+                for (int i = 0; i < MAX_ATTEMPTS; i++)
+                {
+                    // ランダムな円弧上の座標を計算
+                    float randomOffset = Random.Range(-60f, 60f); 
+                    float targetAngle = centerAngle + randomOffset;
+
+                    // プレイヤーとの距離が近すぎる場合、少し離れる目標距離を設定
+                    targetRadius = posDelta.magnitude < 2.5f ? 4.0f : 3.0f;
+                    Vector3 randomPoint = GetPointOnArc(
+                        Owner.player.transform.position, 
+                        targetRadius, 
+                        targetAngle
+                    );
+
+                    // NavMesh上で到達可能かチェック
+                    UnityEngine.AI.NavMeshHit hit;
+
+                    if (UnityEngine.AI.NavMesh.SamplePosition(randomPoint, out hit, 1.0f, UnityEngine.AI.NavMesh.AllAreas))
+                    {
+                        // 有効なNavMesh上の地点が見つかった場合
+                        destination = hit.position;
+                        Owner.navAgent.SetDestination(destination);
+                        Debug.Log($"新しい目的地を設定: {destination}");
+                        return;
+                    }
+                }
+
+                Debug.LogWarning("有効な移動先が見つかりませんでした。前回目的地を維持します。");
             }
         }
 
@@ -421,18 +518,44 @@ namespace StateManager
         // 攻撃判定用メソッド
         private class StateAttack : StateBase
         {
+            string[] attackPattarn = new string[] {"1", "2", "3"};
+            int currentAnimationNum;
             public override void OnStart()
             {
-                Owner.animationState.SetState("Attack", true);
-                Owner.AA.StartAttackHit();
+                Owner.navAgent.isStopped = true;
+                Owner.rb.isKinematic = false;
 
+                // 確率で3パターンから攻撃を選出
+                int choice = Random.Range(0, 100);
+                if (choice < 40)
+                {
+                    Owner.rb.AddForce(Owner.transform.forward * 1.0f, ForceMode.Impulse);
+                    currentAnimationNum = 0;
+                    Owner.animationState.SetState("1", true);
+                }
+                else if(choice < 70)
+                {
+                    Owner.rb.AddForce(Owner.transform.forward * 2.0f, ForceMode.Impulse);
+                    currentAnimationNum = 1;
+                    Owner.animationState.SetState("2", true);
+                }
+                else
+                {
+                    Owner.rb.AddForce(Owner.transform.forward * 2.0f, ForceMode.Impulse);
+                    currentAnimationNum = 2;
+                    Owner.animationState.SetState("3", true);
+                }
+                
+                Owner.AA.StartAttackHit();
                 Debug.Log("start Attack");
             }
 
             public override void OnUpdate()
             {
                 // 攻撃アニメーションが終了したらBattleに遷移
-                if(Owner.animationState.AnimtionFinish("Attack") >= 1f){
+                if(Owner.animationState.AnimtionFinish(
+                    attackPattarn[currentAnimationNum]) >= 1f)
+                {
                     Owner.AA.EndAttackHit();
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
@@ -440,6 +563,8 @@ namespace StateManager
 
             public override void OnEnd()
             {
+                Owner.rb.isKinematic = true;
+                Owner.navAgent.isStopped = false;
                 Debug.Log("end Attack");
             }
         }
@@ -505,6 +630,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                // 死亡判定
                 Owner.CheckDeath();
             }
 
@@ -514,6 +640,7 @@ namespace StateManager
             }
         }
 
+        // プレイヤーにパリィされた際のスタン処理
         public void ChangeParryedState(){
             stateMachine.ChangeState((int) StateType.Parryed);
         }
@@ -546,31 +673,29 @@ namespace StateManager
 
             private async UniTask WaitParryed(CancellationToken token)
             {
-                // 2. 待機時間が始まった時、プレイヤーコントローラー側に用意されているフラグを参照してtrueにする
+                // 待機時間が始まった時、プレイヤーコントローラー側に用意されているフラグを参照してtrueにする
                 playerController.CanStealthAttack(true);
                 Debug.Log("プレイヤーフラグをON: 追撃可能状態");
                 
-                // 1. パリィされた際に、2.5秒程度の待機時間を設ける
-                // .SuppressCancellationThrow() を使用し、例外を発生させずにキャンセルされたかを取得
+                // パリィされた際に、2.5秒程度の待機時間を設ける
                 bool isCanceled = await UniTask.Delay(
                     System.TimeSpan.FromSeconds(PARRY_STUN_DURATION),
                     cancellationToken: token
                 ).SuppressCancellationThrow();
 
-                // 共通処理: プレイヤーのフラグを解除
+                // プレイヤーのフラグを解除
                 playerController.CanStealthAttack(false);
                 Debug.Log("プレイヤーフラグをOFF: 追撃終了");
 
                 if (isCanceled)
                 {
-                    // 4. 待機時間中に外部からのキャンセルがあった場合
+                    // 待機時間中に外部からのキャンセルがあった場合
                     Debug.Log("外部からのキャンセル（例: 追撃ヒット）により、硬直を即時終了");
                     Owner.enemyStatus.m_stun = true;
-                    // キャンセルされた場合、このStateのOnEnd()が実行されるため、ここでは特に状態遷移は行わない
                 }
                 else
                 {
-                    // 3. 待機時間中に何もなかったのであれば（時間切れ）
+                    // 待機時間中に何もなかったのであれば（時間切れ）
                     Debug.Log("硬直時間終了。通常戦闘状態に戻ります。");
                     
                     // 通常の状態に戻る
@@ -581,7 +706,6 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                // 4. 待機時間中に外部からのキャンセルがあった場合 (OnEndが呼ばれるのは、外部でcts.Cancel()が呼ばれた場合)
                 // 待機時間をリセットする = キャンセル処理を行う
                 cts?.Cancel();
                 cts?.Dispose();

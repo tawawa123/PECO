@@ -119,8 +119,6 @@ namespace StateManager
         {
             // LockForEnemy();
 
-            Debug.Log(canStealthAttack);
-
             // 着地判定
             isGrounded = Physics.CheckSphere(transform.position, isGroundedSize, LayerMask.GetMask("Ground"));
 
@@ -578,13 +576,15 @@ namespace StateManager
                 // 移動方向にスピードを掛ける
                 Owner.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, Owner.rb.velocity.y, 0);
 
-                if (Owner.moveForward != Vector3.zero) {
+                if (Owner.moveForward != Vector3.zero) 
+                {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
                     Owner.transform.rotation = Quaternion.Slerp(Owner.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
                 }
 
                 // crouch
-                if(Owner.rb.velocity.magnitude < 0.1f){
+                if(Owner.rb.velocity.magnitude < 0.1f)
+                {
                     StateMachine.ChangeState((int) StateType.Crouch);
                 }
 

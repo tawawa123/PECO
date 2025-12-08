@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// プレイヤーのロックオン機能の制御するクラス
+/// プレイヤーのロックオン機能を制御するクラス
 /// </summary>
 public class PlayerLockon : MonoBehaviour
 {
