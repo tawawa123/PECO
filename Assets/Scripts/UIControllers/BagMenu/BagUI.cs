@@ -5,6 +5,7 @@ public class BagUI : MonoBehaviour
 {
     [SerializeField] private GameObject bagPanel;          // バッグUI本体
     [SerializeField] private GameObject slotPrefab;        // スロットPrefab
+    [SerializeField] private GameObject transformSlotPrefab;        // 変身アイテムスロットPrefab
     [SerializeField] private Transform slotParent;         // スロットを並べる親オブジェクト
     private ItemDataStore itemDataStore;
 
@@ -29,7 +30,6 @@ public class BagUI : MonoBehaviour
             }
             else
             {
-                UseShortcutItem.Instance.HighlightCurrentSlot();
                 ClearBag();
             }
         }
@@ -47,7 +47,12 @@ public class BagUI : MonoBehaviour
             var data = itemDataStore.FindWithId(id);
             if (data != null)
             {
-                var slot = Instantiate(slotPrefab, slotParent);
+                GameObject slot;
+                if(id >= 1000)
+                    slot = Instantiate(transformSlotPrefab, slotParent);
+                else
+                    slot = Instantiate(slotPrefab, slotParent);
+                
                 var slotUI = slot.GetComponent<BagSlotUI>();
                 slotUI.Setup(id, data.Name, data.Image, count);
             }

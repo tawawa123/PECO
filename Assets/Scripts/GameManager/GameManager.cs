@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    [SerializeField] private CinemachineVirtualCamera lockonCam;
+    [SerializeField] private CinemachineFreeLook freeLookCam;
     private GameObject player;
 
     void Awake()
@@ -13,6 +17,8 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+        
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     /// <summury>
@@ -33,5 +39,21 @@ public class GameManager : MonoBehaviour
     public void SetPlayerObj(GameObject player)
     {
         this.player = player;
+    }
+
+    public void ChangeCameraTarget(Transform newFollow, Transform newLookAt = null)
+    {
+        if (freeLookCam == null || lockonCam == null) return;
+
+        if (newFollow != null)
+        {
+            freeLookCam.Follow = newFollow;
+            lockonCam.Follow = newFollow;
+        }
+
+        if (newLookAt != null)
+        {
+            freeLookCam.LookAt = newLookAt;
+        }
     }
 }

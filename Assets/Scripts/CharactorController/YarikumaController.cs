@@ -11,7 +11,7 @@ namespace StateManager
 
     public class YarikumaController : MonoBehaviour, Damagable, StealthAttackable
     {
-        [SerializeField] private GameObject player;
+        private GameObject player;
         private bool findPlayer = false;
 
         private enum StateType
@@ -70,6 +70,7 @@ namespace StateManager
         // Update is called once per frame
         void Update()
         {
+            player = GameManager.Instance.GetPlayerObj();
             stateMachine.OnUpdate();
 
             if(enemyStatus.GetBackstabed){

@@ -26,10 +26,17 @@ public class BagSlotUI : MonoBehaviour
         countText.text = "";
     }
 
-    // UIボタンにこの関数をアサイン
+    // 通常アイテムならば、UIボタンにこの関数をアサイン
     public void OnClickSlot()
     {
         if(itemId != 0)
             ShortcutManager.Instance.AddToShortcut(itemId);
+    }
+
+    // 変身の着ぐるみアイテムなら、この関数をアサイン
+    public void OnClickTransformSlot()
+    {
+        if(itemId != 0)
+            ShortcutManager.Instance.AddToTransformShortcut(itemId);
     }
 }

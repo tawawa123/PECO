@@ -14,25 +14,30 @@ public class InteractManager : MonoBehaviour, Interactable
     private ItemDataStore itemDataStore;
     private Inventory inventory;
 
-    // ステートがGetItemの時のみ
-    [SerializeField] private ItemData itemData;
-
-    // ステートがTalkの時のみ
-    [SerializeField] private ConversationData conversationData;
-    [SerializeField] private GameProgress progress;
-    private bool isTalking = false;
-
-    // ステートがHideの時のみ
-
     public enum InteractState
     {
         Talk,
         Hide,
         GetItem
     }
+    [SerializeField] private InteractState mode;
 
-    [Header("インタラクトタイプ")]
-    [SerializeField] private InteractState state;
+    // ステートがGetItemの時のみ
+    [ShowIf("mode", (int)InteractState.GetItem)]
+    [SerializeField] private ItemData itemData;
+
+    // ステートがTalkの時のみ
+    [ShowIf("mode", (int)InteractState.Talk)]
+    [SerializeField] private ConversationData conversationData;
+
+    [ShowIf("mode", (int)InteractState.Talk)]
+    [SerializeField] private GameProgress progress;
+
+    [ShowIf("mode", (int)InteractState.Talk)]
+    private bool isTalking = false;
+
+    // ステートがHideの時のみ
+
 
     void Awake()
     {
@@ -41,7 +46,7 @@ public class InteractManager : MonoBehaviour, Interactable
     
     public void Interact()
     {
-        Action action = state switch
+        Action action = mode switch
         {
             InteractState.Talk => Talk,
             InteractState.Hide => Hide,
