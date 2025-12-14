@@ -44,7 +44,7 @@ public class Inventory : MonoBehaviour
         {
             var data = itemDataStore.FindWithId(id);
             var player = GameObject.FindGameObjectWithTag("Player");
-            PlayerStatus p_status = player.GetComponent<PlayerStatus>();
+            PlayerStatus p_status = GameManager.Instance.CurrentStatus;
 
             p_status.m_hp += data.Heal;
             p_status.m_hp = Mathf.Clamp(p_status.m_hp, 0, 100);

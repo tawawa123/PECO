@@ -2013,7 +2013,6 @@ GameObject:
   - component: {fileID: 6934836200435613970}
   - component: {fileID: 572800249574085245}
   - component: {fileID: 4669859984894611824}
-  - component: {fileID: 1353506773417042885}
   - component: {fileID: 1341336515848962358}
   - component: {fileID: 2824945429548357783}
   - component: {fileID: 8138156394883222095}
@@ -2124,28 +2123,6 @@ CapsuleCollider:
   m_Height: 1.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.75, z: 0}
---- !u!114 &1353506773417042885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3753300780485292283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a56169754247f74a87f69b492465be5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_hp: 100
-  m_atkDamage: 5
-  m_atkPower: 1
-  m_stumina: 100
-  m_heal: 1
-  m_walkSpeed: 3
-  m_runSpeed: 7
-  m_rotationRate: 6
-  m_avoidPower: 5
-  m_stun: 0
 --- !u!114 &1341336515848962358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2160,6 +2137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stealthAttack: {fileID: 7837450138432204720, guid: 6fb7109a859142944a23dad926e05e2b, type: 3}
   arm: {fileID: -7511558181221131132}
+  num: 0
 --- !u!114 &2824945429548357783
 MonoBehaviour:
   m_ObjectHideFlags: 0

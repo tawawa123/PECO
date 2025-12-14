@@ -2,20 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using GameUI;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [SerializeField] private GameObject interactionUI;
-    [SerializeField] private TextMeshProUGUI interactionText; // TextMeshProUGUIでも可
-
+    private TextMeshProUGUI interactionText; // TextMeshProUGUIでも可
     private Interactable currentTarget;
 
     private void Start()
     {
+        interactionText = UIManager.Instance.Get(UIType.InteractText).GetComponent<TextMeshProUGUI>();
         InteractManager.OnAboutToBeDestroyed += OnTargetDestroyed;
-
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
     }
 
     private void Update()
@@ -38,11 +35,9 @@ public class PlayerInteraction : MonoBehaviour
         if (other.TryGetComponent(out Interactable interactable))
         {
             currentTarget = interactable;
-            if (interactionUI != null)
-            {
-                interactionText.text = interactable.GetInteractionText();
-                interactionUI.SetActive(true);
-            }
+
+            interactionText.text = interactable.GetInteractionText();
+            UIManager.Instance.SetGroupActive(UIGroup.InGame, true);
         }
     }
 
@@ -59,8 +54,7 @@ public class PlayerInteraction : MonoBehaviour
     private void SetFalseInteractUI()
     {
         currentTarget = null;
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
+        UIManager.Instance.SetGroupActive(UIGroup.InGame, false);
     }
 
     private void OnTargetDestroyed(Interactable obj)

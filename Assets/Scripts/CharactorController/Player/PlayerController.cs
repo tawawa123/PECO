@@ -14,7 +14,6 @@ namespace StateManager
         private IPlayerControlStrategy currentStrategy;
 
         private Rigidbody rigid;
-        private PlayerStatus pStatus;
         private AwaitableAnimatorState animator;
         private OverrideDamageLayer damLayer;
         private AttackArea attackArea;
@@ -26,11 +25,11 @@ namespace StateManager
         private bool canStealthAttack;
         private GameObject stealthAttackTarget;
 
+        public int num = 0;
 
         void Awake()
         {
             rigid = GetComponent<Rigidbody>();
-            pStatus = GetComponent<PlayerStatus>();
             animator = GetComponent<AwaitableAnimatorState>();
             damLayer = GetComponent<OverrideDamageLayer>();
             attackArea = GetComponentInChildren<AttackArea>();
@@ -39,7 +38,6 @@ namespace StateManager
 
         public Transform tf => this.transform;
         public Rigidbody rb => rigid;
-        public PlayerStatus playerStatus => pStatus;
         public AwaitableAnimatorState animationState => animator;
         public OverrideDamageLayer damageLayer => damLayer;
         public AttackArea AA => attackArea;
@@ -65,6 +63,11 @@ namespace StateManager
 
         private void Update()
         {
+            if(num != 0)
+            {
+                Transform(num);
+                num = 0;
+            }
             currentStrategy?.Tick();
         }
 
@@ -74,11 +77,19 @@ namespace StateManager
             currentStrategy?.OnExit();
             currentStrategy = next;
             currentStrategy?.OnEnter();
+
+
+            rigid = GetComponent<Rigidbody>();
+            animator = GetComponent<AwaitableAnimatorState>();
+            damLayer = GetComponent<OverrideDamageLayer>();
+            attackArea = GetComponentInChildren<AttackArea>();
+            lockon = GetComponent<PlayerLockon>();
         }
 
 
         public void Transform(int id)
         {
+            Debug.Log(id);
             if(id == 0)
                 ChangeStrategy(new DefaultControllerStrategy(this));
             //if(id == 1000)
@@ -90,7 +101,7 @@ namespace StateManager
 
         public void AddDamage(int damage){
             // playerStatus.m_hp -= damage;
-            if(!playerStatus.GetStun)
+            if(!GameManager.Instance.CurrentStatus.GetStun)
                 currentStrategy?.AddDamage(damage);
         }
 

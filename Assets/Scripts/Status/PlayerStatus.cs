@@ -1,40 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PlayerStatus : MonoBehaviour
+﻿[System.Serializable]
+public class PlayerStatus
 {
 	// ----------------------------------------------
 	// 設定項目
-
-	[SerializeField]
 	public int m_hp = 0;
-
-	[SerializeField]
 	public int m_atkDamage = 0;
-
-	[SerializeField]
 	public int m_atkPower = 0;
-
-	[SerializeField]
 	public float m_stumina = 0.0f;
-
-	[SerializeField]
-	public float m_heal = 1;
-
-	[SerializeField]
 	public float m_walkSpeed = 0.0f;
-
-	[SerializeField]
 	public float m_runSpeed = 0.0f;
-
-	[SerializeField]
 	public float m_rotationRate = 0.0f;
-
-	[SerializeField]
 	public float m_avoidPower = 0.0f;
-
-	[SerializeField]
 	public bool m_stun = false;
 
 
@@ -45,7 +21,6 @@ public class PlayerStatus : MonoBehaviour
 	public int GetAtkDamage 			{ get { return m_atkDamage; } }
 	public int GetAtkPower				{ get { return m_atkPower; } }
 	public float GetStumina				{ get { return m_stumina; } }
-	public float GetHeal 				{ get { return m_heal; } }
 	public float GetWalkSpeed			{ get { return m_walkSpeed; } }
 	public float GetRunSpeed 			{ get { return m_runSpeed; } }
 	public float GetRotationRate 		{ get { return m_rotationRate; } }

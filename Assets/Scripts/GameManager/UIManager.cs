@@ -58,17 +58,6 @@ namespace GameUI
                 }
             }
         }
-
-        public void SetGroupHide(UIGroup group, bool active)
-        {
-            foreach (var ui in uiMap.Values)
-            {
-                if (ui.group == group)
-                {
-                    ui.panel.SetActive(false);
-                }
-            }
-        }
     }
 
 }

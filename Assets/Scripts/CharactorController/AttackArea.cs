@@ -91,7 +91,7 @@ public class AttackArea : MonoBehaviour
     {
         Debug.Log("ガード成功！");
         var controller = target.GetComponentInParent<PlayerController>();
-        var status = target.GetComponentInParent<PlayerStatus>();
+        var status = GameManager.Instance.CurrentStatus;
 
         // スタミナを多めに消費
         status.m_stumina -= 15;
@@ -112,7 +112,7 @@ public class AttackArea : MonoBehaviour
         {
             // PlayerHit
             PlayerController controller = other.gameObject.GetComponentInParent<PlayerController>();
-            PlayerStatus pStatus = other.gameObject.GetComponentInParent<PlayerStatus>();
+            PlayerStatus pStatus = GameManager.Instance.CurrentStatus;
             if (pStatus != null)
             {
                 pStatus.m_hp -= AttackDamage;

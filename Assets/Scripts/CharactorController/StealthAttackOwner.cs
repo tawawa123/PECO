@@ -21,13 +21,16 @@ public class StealthAttackOwner : MonoBehaviour
 
     private void Awake()
     {
-        targetUI = UIManager.Instance.Get(UIType.StealthAttackMarker).transform;
-        playerLockon = this.GetComponent<PlayerLockon>();
-        playerController = this.GetComponent<StateManager.PlayerController>();
-
         // カメラが指定されていなければメインカメラにする
         if (targetCamera == null)
             targetCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        targetUI = UIManager.Instance.Get(UIType.StealthAttackMarker);
+        playerLockon = this.GetComponent<PlayerLockon>();
+        playerController = this.GetComponent<StateManager.PlayerController>();
 
         // 親UIのRectTransformを保持
         parentUI = targetUI.parent.GetComponent<RectTransform>();

@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5130102233669349055}
+  - component: {fileID: 637138428664547614}
   m_Layer: 0
   m_Name: center
   m_TagString: Untagged
@@ -150,6 +151,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 9133671603414978466}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &637138428664547614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8980962622555470234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3456767757c1804a88497d5d6b6b361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8740335220540188745
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -265,9 +278,6 @@ PrefabInstance:
       addedObject: {fileID: 2343174541908747274}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52db38b4a2f8408428406d3058c60fb1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2060726611521238590}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52db38b4a2f8408428406d3058c60fb1, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2707401761212701911}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52db38b4a2f8408428406d3058c60fb1, type: 3}
       insertIndex: -1
@@ -380,6 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stealthAttack: {fileID: 7837450138432204720, guid: 6fb7109a859142944a23dad926e05e2b, type: 3}
   arm: {fileID: 3137072519868208585}
+  num: 0
 --- !u!114 &2343174541908747274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,28 +405,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldOffset: {x: 0, y: 1, z: 0}
   stealthAttackDistance: 4
---- !u!114 &2060726611521238590
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8469724172949329176}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a56169754247f74a87f69b492465be5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_hp: 100
-  m_atkDamage: 5
-  m_atkPower: 1
-  m_stumina: 100
-  m_heal: 1
-  m_walkSpeed: 3
-  m_runSpeed: 7
-  m_rotationRate: 6
-  m_avoidPower: 5
-  m_stun: 0
 --- !u!114 &2707401761212701911
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,7 +1,9 @@
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using StateManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +19,8 @@ public class GameManager : MonoBehaviour
     private int defaultPlayer_id;
     private int transformedPlayer_id;
 
+    private PlayerStatus currentStatus;
+
 
     void Awake()
     {
@@ -26,8 +30,22 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         
         player = GameObject.FindGameObjectWithTag("Player");
+
+        currentStatus = new PlayerStatus()
+        {
+            m_hp = 100,
+            m_atkDamage = 5,
+            m_atkPower = 1,
+            m_stumina = 100f,
+            m_walkSpeed = 3.5f,
+            m_runSpeed = 6f,
+            m_rotationRate = 8f,
+            m_avoidPower = 5f,
+            m_stun = false
+        };
     }
 
+    public PlayerStatus CurrentStatus => currentStatus;
 
     /// <summury>
     /// ゲームマネージャー
@@ -52,6 +70,30 @@ public class GameManager : MonoBehaviour
         {
             freeLookCam.LookAt = newLookAt;
         }
+    }
+
+    /// <summury>
+    /// シーン遷移管理
+    /// スタートシーンとゲームシーン
+    /// 
+    /// Start -> 開始シーン
+    /// SampleScene -> ゲームシーン
+    /// <summury>
+    public void ChangeGameScene()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
+    public void ChangeStartScene()
+    {
+        SceneManager.LoadScene("Start");
+    }
+    public void ExitGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;//ゲームプレイ終了
+        #else
+            Application.Quit();//ゲームプレイ終了
+        #endif
     }
 
     /// <summury>

@@ -5,13 +5,12 @@ using UnityEngine.UI;
 
 public class PlayerHP : MonoBehaviour
 {
-    [SerializeField] private GameObject Player;
     private Slider slider;
     private PlayerStatus p_status;
 
-    void Awake()
+    private void Start()
     {
-        p_status = Player.GetComponent<PlayerStatus>();
+        p_status = GameManager.Instance.CurrentStatus;
         slider = this.GetComponent<Slider>();
 
         slider.maxValue = p_status.GetHp;

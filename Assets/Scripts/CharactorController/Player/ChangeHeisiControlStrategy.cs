@@ -12,6 +12,8 @@ namespace StateManager
 
     public class ChangeHeisiControllerStrategy : IPlayerControlStrategy
     {
+        private PlayerStatus playerStatus;
+
         // ctx = PlayerControllerへの参照
         private PlayerController ctx;
         public ChangeHeisiControllerStrategy(PlayerController context)
@@ -73,6 +75,8 @@ namespace StateManager
         // 呼び出されたときの初期化処理
         public void OnEnter()
         {
+            playerStatus = GameManager.Instance.CurrentStatus;
+
             // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<ChangeHeisiControllerStrategy>(this);
             stateMachine.Add<StateIdle>((int) StateType.Idle);                      // Idle
@@ -108,7 +112,6 @@ namespace StateManager
             stateMachine.OnUpdate();
 
             // LockForEnemy();
-            ctx.playerStatus.m_stumina = Mathf.MoveTowards(ctx.playerStatus.GetStumina, 100, Time.deltaTime * 2);
 
             // 着地判定
             isGrounded = Physics.CheckSphere(ctx.tf.position, isGroundedSize, LayerMask.GetMask("Ground"));
@@ -116,7 +119,7 @@ namespace StateManager
             inputHorizontal = Input.GetAxisRaw("Horizontal");
             inputVertical = Input.GetAxisRaw("Vertical");
 
-            if(ctx.playerStatus.GetHp <= 0)
+            if(playerStatus.GetHp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
 
             stateMachine.OnUpdate();
@@ -218,6 +221,9 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Debug.Log(Owner.playerStatus.m_stumina);
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
+
                 // Crouch
                 if(Input.GetKeyDown(KeyCode.LeftControl))
                 {
@@ -281,6 +287,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
                 // 何もしない
             }
 
@@ -305,14 +312,16 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
+
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
-                ctx.rb.velocity = Owner.moveForward * ctx.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
+                ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
-                    ctx.tf.rotation = Quaternion.Slerp(ctx.tf.rotation, Owner.targetRotation, Time.deltaTime * ctx.playerStatus.GetRotationRate);
+                    ctx.tf.rotation = Quaternion.Slerp(ctx.tf.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
                 }
 
                 // Idle
@@ -386,12 +395,13 @@ namespace StateManager
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
-                ctx.rb.velocity = Owner.moveForward * ctx.playerStatus.GetRunSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
+                ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetRunSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
+                Owner.playerStatus.m_stumina -= 0.01f;
                 
                 // 向いている方向に回転
                 if (Owner.moveForward != Vector3.zero) {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
-                    ctx.transform.rotation = Quaternion.Slerp(ctx.transform.rotation, Owner.targetRotation, Time.deltaTime * ctx.playerStatus.GetRotationRate);
+                    ctx.transform.rotation = Quaternion.Slerp(ctx.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
                 }
 
                 // Idle
@@ -456,7 +466,7 @@ namespace StateManager
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Jump", true);
-                ctx.rb.AddForce(ctx.transform.up * ctx.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                ctx.rb.AddForce(ctx.transform.up * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
             }
 
             public override void OnUpdate()
@@ -464,7 +474,7 @@ namespace StateManager
                 // 方向制御
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
-                ctx.rb.velocity = Owner.moveForward * ctx.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
+                ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 // 着地
                 if(ctx.animationState.AnimtionFinish("Jump") >= 0.5f && Owner.isGrounded)
@@ -500,7 +510,7 @@ namespace StateManager
                 // 方向制御
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
-                ctx.rb.velocity = Owner.moveForward * ctx.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
+                ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 // 着地
                 if(Owner.isGrounded)
@@ -533,7 +543,8 @@ namespace StateManager
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Rolling");
-                ctx.rb.AddForce(ctx.transform.forward * ctx.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                Owner.playerStatus.m_stumina -= 20;
+                ctx.rb.AddForce(ctx.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
                 ctx.gameObject.layer = LayerMask.NameToLayer("Avoid");
             }
 
@@ -572,6 +583,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
+
                 // idle 
                 if(Input.GetKeyUp(KeyCode.LeftControl))
                 {
@@ -615,15 +628,17 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
+
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
                 Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
-                ctx.rb.velocity = Owner.moveForward * ctx.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
+                ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 if (Owner.moveForward != Vector3.zero) 
                 {
                     Owner.targetRotation = Quaternion.LookRotation(Owner.moveForward);
-                    ctx.transform.rotation = Quaternion.Slerp(ctx.transform.rotation, Owner.targetRotation, Time.deltaTime * ctx.playerStatus.GetRotationRate);
+                    ctx.transform.rotation = Quaternion.Slerp(ctx.transform.rotation, Owner.targetRotation, Time.deltaTime * Owner.playerStatus.GetRotationRate);
                 }
 
                 // crouch
@@ -670,7 +685,7 @@ namespace StateManager
                 Debug.Log("start sliding");
 
                 ctx = Owner.ctx;
-                ctx.rb.AddForce(ctx.transform.forward * ctx.playerStatus.GetAvoidPower, ForceMode.Impulse);
+                ctx.rb.AddForce(ctx.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
                 ctx.animationState.SetState("Sliding", true);
             }
 
@@ -703,6 +718,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
+
                 if(Input.GetKeyDown(KeyCode.F))
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
@@ -788,6 +805,7 @@ namespace StateManager
 
                 ctx.AA.StartAttackHit();
                 ctx.animationState.SetState(anim, true);
+                Owner.playerStatus.m_stumina -= 10.0f;
 
                 WaitForComboInput(anim).Forget();
             }
@@ -837,7 +855,6 @@ namespace StateManager
 
                 ctx = Owner.ctx;
                 // 特殊攻撃判定
-
                 // ステルスアタック
                 if(ctx.GetStealthAttackFlag())
                 {
@@ -854,6 +871,7 @@ namespace StateManager
 
                 ctx.weapon.enabled = true;
                 ctx.AA.StartAttackHit();
+                Owner.playerStatus.m_stumina -= 15f;
                 ctx.animationState.SetState("DashAttack", true);
             }
 
@@ -986,7 +1004,7 @@ namespace StateManager
                 Debug.Log("start Damage");
 
                 ctx = Owner.ctx;
-                Debug.Log(ctx.playerStatus.GetHp);
+                Debug.Log(Owner.playerStatus.GetHp);
 
                 Debug.Log(ctx.damageLayer);
                 ctx.damageLayer.SetState("Light_Damage", true);
@@ -1062,6 +1080,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                Owner.playerStatus.m_stumina -= 0.03f;
                 if (Input.GetMouseButtonUp(1))
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
@@ -1098,7 +1117,7 @@ namespace StateManager
                 
                 // アニメーションステートを設定
                 ctx.animationState.SetState("Stun", true);
-                ctx.playerStatus.m_stun = true;
+                Owner.playerStatus.m_stun = true;
 
                 // 非同期処理を開始
                 WaitStun(cts.Token).Forget();
@@ -1130,7 +1149,7 @@ namespace StateManager
                     Debug.Log("硬直時間終了。通常戦闘状態に戻ります。");
                     
                     // 通常の状態に戻る
-                    ctx.playerStatus.m_stun = false;
+                    Owner.playerStatus.m_stun = false;
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
             }
@@ -1143,7 +1162,7 @@ namespace StateManager
                 cts = null;
 
                 // 今スタンしているかどうか
-                ctx.playerStatus.m_stun = false;
+                Owner.playerStatus.m_stun = false;
                 Debug.Log("end stun");
             }
         }

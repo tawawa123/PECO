@@ -54,6 +54,13 @@ public class AwaitableAnimatorState : MonoBehaviour
 
     public void SetState(string nextState, bool loop = false, float DurationTimeSecond = 0.1f)
     {
+        if (_animator == null)
+        {
+            _animator = GetComponent<Animator>();
+            // アニメーターがアタッチされていない場合の保険
+            if (_animator == null) return;
+        }
+
         this.loop = loop;
         this.DurationTimeSecond = DurationTimeSecond;
         if (_animator.HasState(0, Animator.StringToHash(nextState)))

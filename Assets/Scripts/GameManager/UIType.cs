@@ -17,6 +17,8 @@ namespace GameUI
 
         Minimap,        // ミニマップ
         TalkWindow,     // 会話ウィンドウ
+        InteractMenu,
+        InteractText,
     }
 
     public enum UIGroup
