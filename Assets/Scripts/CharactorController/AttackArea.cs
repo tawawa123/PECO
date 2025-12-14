@@ -95,12 +95,6 @@ public class AttackArea : MonoBehaviour
 
         // スタミナを多めに消費
         status.m_stumina -= 15;
-        if(status.GetStumina <= 0)
-        {
-            controller.ChangeStunState();
-            Debug.Log("スタミナがなくなりました。　スタンします。");
-        }
-        Debug.Log(controller);
     }
     
     // ヒット時の処理
@@ -119,14 +113,8 @@ public class AttackArea : MonoBehaviour
             }
 
             // スタミナ少なめに消費
-            pStatus.m_stumina -= 10;
-            Debug.Log(pStatus.GetStumina);
-            if(pStatus.GetStumina <= 0)
-            {
-                controller.ChangeStunState();
-                Debug.Log("スタミナがなくなりました。　スタンします。");
-            }
-            Debug.Log(controller);
+            if (!pStatus.GetStun)
+                pStatus.m_stumina -= 10;
         }
         else if (statusType == "EnemyStatus")
         {

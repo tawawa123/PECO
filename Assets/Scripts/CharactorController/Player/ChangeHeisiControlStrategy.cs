@@ -121,6 +121,16 @@ namespace StateManager
 
             if(playerStatus.GetHp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
+            
+            playerStatus.m_stumina = Mathf.Clamp(playerStatus.GetStumina, 0, 100);
+            if(playerStatus.GetStumina <= 0)
+            {
+                playerStatus.m_stun = true;
+                stateMachine.ChangeState((int) StateType.Stun);
+            }
+            
+            if(Input.GetKeyDown(KeyCode.Tab))
+                stateMachine.ChangeState((int) StateType.UIControll);
 
             stateMachine.OnUpdate();
         }
@@ -221,7 +231,6 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                Debug.Log(Owner.playerStatus.m_stumina);
                 Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
 
                 // Crouch
@@ -281,7 +290,7 @@ namespace StateManager
             public override void OnStart()
             {
                 ctx = Owner.ctx;
-                Debug.Log("start Idle");
+                Debug.Log("start UIControll");
                 ctx.animationState.SetState("Idle", true);
             }
 
@@ -293,7 +302,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Idle");
+                Debug.Log("end UIControll");
             }
         }
 
@@ -1103,7 +1112,7 @@ namespace StateManager
             private CancellationTokenSource cts;
             private PlayerController playerController;
 
-            // パリィ硬直時間
+            // スタン硬直時間
             private const float STUN_DURATION = 2.5f; 
 
             public override void OnStart()
@@ -1121,6 +1130,11 @@ namespace StateManager
 
                 // 非同期処理を開始
                 WaitStun(cts.Token).Forget();
+            }
+
+            public override void OnUpdate()
+            {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 6);
             }
 
             private async UniTask WaitStun(CancellationToken token)

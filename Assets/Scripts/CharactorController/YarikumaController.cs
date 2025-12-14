@@ -764,6 +764,7 @@ namespace StateManager
             {
                 Debug.Log("体力が0になりました");
                 if(Owner.animationState.AnimtionFinish("Death") >= 1f){
+                    GameManager.Instance.CheckGameCrear();
                     Destroy(Owner.gameObject);
                 }
             }

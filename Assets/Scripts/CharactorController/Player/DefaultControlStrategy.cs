@@ -122,6 +122,13 @@ namespace StateManager
 
             if(playerStatus.GetHp <= 0)
                 stateMachine.ChangeState((int) StateType.GameOver);
+            
+            playerStatus.m_stumina = Mathf.Clamp(playerStatus.GetStumina, 0, 100);
+            if(playerStatus.GetStumina <= 0)
+            {
+                playerStatus.m_stun = true;
+                stateMachine.ChangeState((int) StateType.Stun);
+            }
 
             stateMachine.OnUpdate();
         }
@@ -1103,7 +1110,7 @@ namespace StateManager
             private CancellationTokenSource cts;
             private PlayerController playerController;
 
-            // パリィ硬直時間
+            // スタン硬直時間
             private const float STUN_DURATION = 2.5f; 
 
             public override void OnStart()
@@ -1121,6 +1128,11 @@ namespace StateManager
 
                 // 非同期処理を開始
                 WaitStun(cts.Token).Forget();
+            }
+
+            public override void OnUpdate()
+            {
+                Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 6);
             }
 
             private async UniTask WaitStun(CancellationToken token)

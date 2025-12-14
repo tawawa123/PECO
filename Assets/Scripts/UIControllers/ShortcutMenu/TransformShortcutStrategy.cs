@@ -108,8 +108,8 @@ public class TransformShortcutStrategy : ShortcutStrategy
     {
         // 新プレイヤーを生成　旧プレイヤーを破棄
         nextPlayer = Object.Instantiate(nextPlayer, culPlayer.transform.position, culPlayer.transform.rotation);
-        //GameObject.Destroy(culPlayer);
-        culPlayer.SetActive(false);
+        GameObject.Destroy(culPlayer);
+        //culPlayer.SetActive(false);
 
         // カメラの追跡対象を更新
         Transform center = nextPlayer.transform.Find("center");

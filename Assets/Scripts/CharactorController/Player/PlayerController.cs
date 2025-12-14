@@ -63,6 +63,8 @@ namespace StateManager
 
         private void Update()
         {
+            // 無理やり変身させるための処理
+            // ひどすぎるので修正
             if(num != 0)
             {
                 Transform(num);
@@ -77,21 +79,17 @@ namespace StateManager
             currentStrategy?.OnExit();
             currentStrategy = next;
             currentStrategy?.OnEnter();
-
-
-            rigid = GetComponent<Rigidbody>();
-            animator = GetComponent<AwaitableAnimatorState>();
-            damLayer = GetComponent<OverrideDamageLayer>();
-            attackArea = GetComponentInChildren<AttackArea>();
-            lockon = GetComponent<PlayerLockon>();
         }
 
 
         public void Transform(int id)
         {
-            Debug.Log(id);
+            GameManager.Instance.CurrentStatus.m_transform = true;
             if(id == 0)
+            {
+                GameManager.Instance.CurrentStatus.m_transform = false;
                 ChangeStrategy(new DefaultControllerStrategy(this));
+            }
             //if(id == 1000)
             //   ChangeStrategy(new ChangeKumaControllerStrategy(this));
             if(id == 1001)

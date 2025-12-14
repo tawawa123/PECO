@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using StateManager;
+using GameUI;
 
 public class GameManager : MonoBehaviour
 {
@@ -41,11 +42,22 @@ public class GameManager : MonoBehaviour
             m_runSpeed = 6f,
             m_rotationRate = 8f,
             m_avoidPower = 5f,
-            m_stun = false
+            m_stun = false,
+            m_transform = false,
         };
     }
 
     public PlayerStatus CurrentStatus => currentStatus;
+
+    public int num = 0;
+    public void CheckGameCrear()
+    {
+        num += 1;
+        if(num >= 3)
+        {
+            UIManager.Instance.Show(UIType.GameCrearMenu);
+        }
+    }
 
     /// <summury>
     /// ゲームマネージャー

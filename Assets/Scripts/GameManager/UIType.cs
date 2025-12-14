@@ -7,6 +7,7 @@ namespace GameUI
         PauseMenu,      // ポーズメニュー
         Inventory,      // バッグメニュー
         GameOverMenu,   // 死亡時メニュー
+        GameCrearMenu,
 
         HPBar,          // プレイヤーの体力
         StaminaBar,     // プレイヤーのスタミナ

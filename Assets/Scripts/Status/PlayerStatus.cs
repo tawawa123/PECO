@@ -12,6 +12,7 @@ public class PlayerStatus
 	public float m_rotationRate = 0.0f;
 	public float m_avoidPower = 0.0f;
 	public bool m_stun = false;
+	public bool m_transform = false;
 
 
 	// ----------------------------------------------
@@ -26,4 +27,5 @@ public class PlayerStatus
 	public float GetRotationRate 		{ get { return m_rotationRate; } }
 	public float GetAvoidPower			{ get { return m_avoidPower; } }
 	public bool GetStun 				{ get { return m_stun; } }
+	public bool GetTransform 			{ get { return m_transform; } }
 }
