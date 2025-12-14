@@ -433,7 +433,7 @@ namespace StateManager
                     int choice = Random.Range(0, 100);
                     Debug.Log(choice);
                     
-                    if (choice < 60) // 60%
+                    if (choice < 75) // 60%
                     {
                         // 攻撃に遷移
                         StateMachine.ChangeState((int) StateType.Attack);

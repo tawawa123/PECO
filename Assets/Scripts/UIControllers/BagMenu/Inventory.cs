@@ -19,8 +19,7 @@ public class Inventory : MonoBehaviour
 
         // サンプル初期データ
         items.Add(1, 3);
-        items.Add(2, 5);
-        items.Add(1000, 1);
+        items.Add(1001, 1);
     }
 
     public void AddItem(int id, int count = 1)

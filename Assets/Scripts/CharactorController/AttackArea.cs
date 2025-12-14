@@ -59,7 +59,7 @@ public class AttackArea : MonoBehaviour
                     else if (pParryController.IsGuarding)
                     {                        
                         ProcessGuardSuccess(other.gameObject);
-                        ProcessParried(other.gameObject); 
+                        //ProcessParried(other.gameObject); 
                         
                         return;
                     }
@@ -80,7 +80,7 @@ public class AttackArea : MonoBehaviour
     private void ProcessParried(GameObject target)
     {
         // 敵のアニメーションを硬直させたり、武器の軌道をリセットしたりする処理をここに追加
-        Debug.Log("🛡️ 攻撃がパリィ/ガードされました！");
+        Debug.Log("攻撃がパリィ/ガードされました！");
         var controller = this.GetComponentInParent<YarikumaController>();
         controller.ChangeParryedState();
         EndAttackHit(); // コライダーを無効化して多段ヒット防止
@@ -89,9 +89,18 @@ public class AttackArea : MonoBehaviour
     // ガード成功時のプレイヤー側の処理
     private void ProcessGuardSuccess(GameObject target)
     {
-        // プレイヤーのスタミナ消費やノックバック処理などを呼び出す
-        Debug.Log("✅ ガード成功！");
-        // 例: target.GetComponentInParent<PlayerStatus>().ConsumeStamina(guardCost);
+        Debug.Log("ガード成功！");
+        var controller = target.GetComponentInParent<PlayerController>();
+        var status = target.GetComponentInParent<PlayerStatus>();
+
+        // スタミナを多めに消費
+        status.m_stumina -= 15;
+        if(status.GetStumina <= 0)
+        {
+            controller.ChangeStunState();
+            Debug.Log("スタミナがなくなりました。　スタンします。");
+        }
+        Debug.Log(controller);
     }
     
     // ヒット時の処理
@@ -102,11 +111,22 @@ public class AttackArea : MonoBehaviour
         if (statusType == "PlayerStatus")
         {
             // PlayerHit
+            PlayerController controller = other.gameObject.GetComponentInParent<PlayerController>();
             PlayerStatus pStatus = other.gameObject.GetComponentInParent<PlayerStatus>();
             if (pStatus != null)
             {
                 pStatus.m_hp -= AttackDamage;
             }
+
+            // スタミナ少なめに消費
+            pStatus.m_stumina -= 10;
+            Debug.Log(pStatus.GetStumina);
+            if(pStatus.GetStumina <= 0)
+            {
+                controller.ChangeStunState();
+                Debug.Log("スタミナがなくなりました。　スタンします。");
+            }
+            Debug.Log(controller);
         }
         else if (statusType == "EnemyStatus")
         {
@@ -120,7 +140,7 @@ public class AttackArea : MonoBehaviour
         
         // インターフェイス呼び出し
         var damagetarget = (statusType == "PlayerStatus") 
-            ? other.gameObject.GetComponentInParent<Damagable>()
+            ? other.gameObject.GetComponent<Damagable>()
             : other.gameObject.GetComponent<Damagable>();
         
         if (damagetarget != null)

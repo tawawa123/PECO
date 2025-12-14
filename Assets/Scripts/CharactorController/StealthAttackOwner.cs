@@ -1,16 +1,17 @@
 using UnityEngine;
+using GameUI;
 
 public class StealthAttackOwner : MonoBehaviour
 {
-    // オブジェクトを映すカメラ
-    [SerializeField] private Camera targetCamera;
-    // 表示するUI
-    [SerializeField] private Transform targetUI;
     // オブジェクト位置のオフセット
     [SerializeField] private Vector3 worldOffset;
     // 表示させる距離
     [SerializeField] private float stealthAttackDistance;
     
+    // 表示するUI
+    private Transform targetUI;
+    // オブジェクトを映すカメラ
+    private Camera targetCamera;
     // UIを表示させる対象オブジェクト
     private GameObject target;
 
@@ -20,6 +21,7 @@ public class StealthAttackOwner : MonoBehaviour
 
     private void Awake()
     {
+        targetUI = UIManager.Instance.Get(UIType.StealthAttackMarker).transform;
         playerLockon = this.GetComponent<PlayerLockon>();
         playerController = this.GetComponent<StateManager.PlayerController>();
 
@@ -36,14 +38,14 @@ public class StealthAttackOwner : MonoBehaviour
         target = playerLockon.GetLockonTarget(stealthAttackDistance);
         // 近くに敵がいなかったら終了
         if(target == null){
-            targetUI.gameObject.SetActive(false);
+            UIManager.Instance.Hide(UIType.StealthAttackMarker);
             playerController.CanStealthAttack(false);
             return;
         }
 
         // カメラに敵が映っていなければ終了
         if (!CheckTargetOnFront()){
-            targetUI.gameObject.SetActive(false);
+            UIManager.Instance.Hide(UIType.StealthAttackMarker);
             playerController.CanStealthAttack(false);
             return;
         }
@@ -51,7 +53,7 @@ public class StealthAttackOwner : MonoBehaviour
         // 敵がプレイヤーに気づいていたら終了
         var enemyStatus = target.GetComponent<EnemyStatus>();
         if (enemyStatus.GetVigilancePoint == 100f && enemyStatus.m_stun){
-            targetUI.gameObject.SetActive(false);
+            UIManager.Instance.Hide(UIType.StealthAttackMarker);
             playerController.CanStealthAttack(false);
             return;
         }
@@ -64,7 +66,6 @@ public class StealthAttackOwner : MonoBehaviour
 
     private bool CheckTargetOnFront()
     {
-
         var cameraTransform = targetCamera.transform;
 
         var cameraDir = cameraTransform.forward; // カメラの向き
@@ -79,7 +80,7 @@ public class StealthAttackOwner : MonoBehaviour
     // UIの位置を更新する
     private void OnUpdatePosition()
     {
-        targetUI.gameObject.SetActive(true);
+        UIManager.Instance.Show(UIType.StealthAttackMarker);
 
         // UIがオブジェクトに重なるように座標変換
         var targetScreenPos = targetCamera.WorldToScreenPoint(target.transform.position + worldOffset);

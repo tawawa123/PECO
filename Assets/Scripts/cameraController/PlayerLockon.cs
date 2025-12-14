@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using GameUI;
 
 /// <summary>
 /// プレイヤーのロックオン機能を制御するクラス
@@ -12,7 +13,6 @@ public class PlayerLockon : MonoBehaviour
     [SerializeField] private float lockonRange = 20;
     [SerializeField] private LayerMask lockonLayers = 0;
     [SerializeField] private LayerMask lockonObstacleLayers = 0;
-    [SerializeField] private GameObject lockonCursor;
 
     private float lockonFactor = 0.3f;
     private float lockonThreshold = 0.5f;
@@ -45,7 +45,7 @@ public class PlayerLockon : MonoBehaviour
                 {
                     targetObj = rightEnemy;
                     playerCamera.ActiveLockonCamera(targetObj);
-                    lockonCursor.SetActive(true);
+                    UIManager.Instance.Show(UIType.LockonCursor);
                 }
 
             }
@@ -57,7 +57,7 @@ public class PlayerLockon : MonoBehaviour
                 {
                     targetObj = leftEnemy;
                     playerCamera.ActiveLockonCamera(targetObj);
-                    lockonCursor.SetActive(true);
+                    UIManager.Instance.Show(UIType.LockonCursor);
                 }
             }
 
@@ -66,7 +66,7 @@ public class PlayerLockon : MonoBehaviour
             {
                 playerCamera.InactiveLockonCamera();
                 isLockon = false;
-                lockonCursor.SetActive(false);
+                UIManager.Instance.Hide(UIType.LockonCursor);
                 lockonInput = false;
                 targetObj = null;
                 return;
@@ -80,7 +80,7 @@ public class PlayerLockon : MonoBehaviour
             if (isLockon)
             {
                 isLockon = false;
-                lockonCursor.SetActive(false);
+                UIManager.Instance.Hide(UIType.LockonCursor);
                 lockonInput = false;
                 playerCamera.InactiveLockonCamera();
                 targetObj = null;
@@ -94,7 +94,7 @@ public class PlayerLockon : MonoBehaviour
             {
                 isLockon = true;
                 playerCamera.ActiveLockonCamera(targetObj);
-                lockonCursor.SetActive(true);
+                UIManager.Instance.Show(UIType.LockonCursor);
             }
             else
             {
@@ -107,12 +107,13 @@ public class PlayerLockon : MonoBehaviour
         // ロックオンカーソル
         if (isLockon)
         {
+            Transform lockonCursor = UIManager.Instance.Get(UIType.LockonCursor);
             lockonCursor.transform.position = mainCamera.WorldToScreenPoint(targetObj.transform.position);
             float lookAtDistance = Vector3.Distance(playerCamera.GetLookAtTransform().position, originTrn.position);
             if (lookAtDistance > lockonRange)
             {
                 isLockon = false;
-                lockonCursor.SetActive(false);
+                UIManager.Instance.Hide(UIType.LockonCursor);
                 lockonInput = false;
                 playerCamera.InactiveLockonCamera();
                 targetObj = null;

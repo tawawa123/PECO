@@ -56,5 +56,13 @@ namespace App.BaseSystem.DataStores.ScriptableObjects.Item
         }
         [SerializeField]
         private Sprite image;
+
+        public GameObject Costume
+        {
+            get => costume;
+            set => costume = value;
+        }
+        [SerializeField]
+        private GameObject costume;
     }
 }

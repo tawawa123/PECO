@@ -1,18 +1,23 @@
 using UnityEngine;
 using Cinemachine;
+using System.Linq;
 
 /// <summary>
 /// CinemachineVirtualCameraを制御するクラス
 /// </summary>
 public class PlayerCamera : MonoBehaviour
 {
-    [Header("ロックオンカメラ")]
-    [SerializeField] CinemachineVirtualCamera lockonCamera;
+    private CinemachineVirtualCamera lockonCamera;
 
     // カメラ優先度
-    readonly int LockonCameraActivePriority = 11;
-    readonly int LockonCameraInactivePriority = 0;
+    private readonly int LockonCameraActivePriority = 11;
+    private readonly int LockonCameraInactivePriority = 0;
 
+    public void Awake()
+    {
+        CinemachineVirtualCamera[] allCameras = FindObjectsOfType<CinemachineVirtualCamera>();
+        lockonCamera = allCameras.FirstOrDefault(cam => cam.name == "LockonCamera");
+    }
 
     /// <summary>
     /// ロックオン時のVirtualCamera切り替え

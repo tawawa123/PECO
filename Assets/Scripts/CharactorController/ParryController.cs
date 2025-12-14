@@ -35,7 +35,7 @@ public class PlayerParryController : MonoBehaviour
             {
                 // ガード開始時の処理
                 IsGuarding = true;
-                playerController.ChangeGuardState();
+                //playerController.ChangeGuardState();
             }
         }
         else if (Input.GetMouseButtonUp(1))
@@ -52,7 +52,7 @@ public class PlayerParryController : MonoBehaviour
         IsParryActive = true;
         IsParrySuccessful = false;
         
-        Debug.Log("🛡️ パリィ受付開始！");
+        Debug.Log("パリィ受付開始！");
 
         // キャンセルされたかどうかがBoolで返ってくる
         bool isCanceled = await UniTask.Delay(
@@ -72,16 +72,13 @@ public class PlayerParryController : MonoBehaviour
             else
             {
                 Debug.Log("なんでここ来たん？ 失敗ですけれども");
-                // ここに到達することは稀だが、例外を使わない場合の安全策。
-                // (通常、成功時のみキャンセルされるため)
             }
         }
         else // タイムアウト
         {
-            // 時間切れで、かつパリィが成功しなかった場合
             if (!IsParrySuccessful)
             {
-                Debug.Log("❌ パリィ失敗：タイムアウト。");
+                Debug.Log("パリィ失敗：タイムアウト。");
             }
         }
         
@@ -105,5 +102,14 @@ public class PlayerParryController : MonoBehaviour
             // 待ち時間キャンセルして終了処理移行
             parryCts?.Cancel();
         }
+    }
+
+    public void NotifyGuardSuccess()
+    {
+        // ガード成功時の処理
+        // playerController.ChangeGuardState();
+            
+        // 待ち時間キャンセルして終了処理移行
+        parryCts?.Cancel();
     }
 }
