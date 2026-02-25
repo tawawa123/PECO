@@ -14,11 +14,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CinemachineFreeLook freeLookCam;
     private GameObject player;
 
-    public bool IsTransforming => currentTransformItemId != 0;
-
     private int currentTransformItemId = 0;
+    public bool IsTransforming => currentTransformItemId != 0;
     private int defaultPlayer_id;
-    private int transformedPlayer_id;
 
     private PlayerStatus currentStatus;
 
@@ -124,14 +122,12 @@ public class GameManager : MonoBehaviour
         this.player = player;
     }
 
-
     /// <summury>
     /// 変身の管理
-    /// 本当はここでやるべきじゃないけど、時間がないので
     /// 
     /// UseItemから呼ばれて、現在のオブジェクトの情報を保持しておく
     /// <summury>
-    public void StartTransform(int itemId)
+    public void SetTransformItemId(int itemId)
     {
         currentTransformItemId = itemId;
     }

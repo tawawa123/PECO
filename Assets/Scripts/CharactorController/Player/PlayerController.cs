@@ -25,6 +25,7 @@ namespace StateManager
         private bool canStealthAttack;
         private GameObject stealthAttackTarget;
 
+
         public int num = 0;
 
         void Awake()
@@ -58,24 +59,21 @@ namespace StateManager
 
         public void Start()
         {
-            ChangeStrategy(new DefaultControllerStrategy(this));
+            // ChangeStrategy(new DefaultControllerStrategy(this));
         }
 
         private void Update()
         {
-            // 無理やり変身させるための処理
-            // ひどすぎるので修正
-            if(num != 0)
+            if (currentStrategy == null)
             {
-                Transform(num);
-                num = 0;
+                currentStrategy = new DefaultControllerStrategy(this);
+                currentStrategy.OnEnter();
             }
             currentStrategy?.Tick();
         }
 
         public void ChangeStrategy(IPlayerControlStrategy next)
         {
-            Debug.Log(next);
             currentStrategy?.OnExit();
             currentStrategy = next;
             currentStrategy?.OnEnter();

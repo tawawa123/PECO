@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using GameUI;
+using SoundEffects;
 
 namespace StateManager
 {
@@ -110,8 +111,6 @@ namespace StateManager
         // Update
         public void Tick()
         {
-            stateMachine.OnUpdate();
-
             // LockForEnemy();
 
             // 着地判定
@@ -319,6 +318,12 @@ namespace StateManager
 
             public override void OnUpdate()
             {
+                // SEManager.Instance.PlaySE(
+                //     SEType.Walk,
+                //     SEGroup.Player,
+                //     Owner.ctx.transform.position
+                // );
+
                 Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
 
                 Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;

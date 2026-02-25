@@ -6,6 +6,7 @@ using StateManager;
 public class AttackArea : MonoBehaviour
 {
     [SerializeField] private int AttackDamage;
+    [SerializeField] private GameObject Hit;
     private Collider attackAreaCollider = null;
 
     // 攻撃した回数 (多段ヒット防止用)
@@ -46,7 +47,7 @@ public class AttackArea : MonoBehaviour
                 
                 // パリィ成功時の処理
                 if (pParryController != null)
-                {   
+                {
                     if (pParryController.IsParryActive)
                     {
                         // パリィ成功判定
@@ -80,8 +81,9 @@ public class AttackArea : MonoBehaviour
     private void ProcessParried(GameObject target)
     {
         // 敵のアニメーションを硬直させたり、武器の軌道をリセットしたりする処理をここに追加
-        Debug.Log("攻撃がパリィ/ガードされました！");
-        var controller = this.GetComponentInParent<YarikumaController>();
+        Debug.Log("攻撃をパリィしました！");
+        var controller = this.GetComponentInParent<EnemyController>();
+
         controller.ChangeParryedState();
         EndAttackHit(); // コライダーを無効化して多段ヒット防止
     }
@@ -124,6 +126,8 @@ public class AttackArea : MonoBehaviour
             {
                 eStatus.m_hp -= AttackDamage;
             }
+
+            GameObject.Instantiate(Hit, other.gameObject.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
         }
         
         // インターフェイス呼び出し

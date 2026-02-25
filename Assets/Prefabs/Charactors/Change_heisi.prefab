@@ -119,6 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttackDamage: 5
+  Hit: {fileID: 3138035950032848646, guid: d9e51653e4e61bf47bf28316cd9510c6, type: 3}
 --- !u!1 &8980962622555470234
 GameObject:
   m_ObjectHideFlags: 0
