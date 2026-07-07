@@ -134113,6 +134113,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4196985795353924029, guid: 2d4c3fb9a1bfa39419318f27c4847b43, type: 3}
+      propertyPath: enemyWeaponLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4566007357988268609, guid: 2d4c3fb9a1bfa39419318f27c4847b43, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.1
@@ -134161,6 +134165,14 @@ PrefabInstance:
       propertyPath: interactionText
       value: 
       objectReference: {fileID: 1137832255}
+    - target: {fileID: 8138156394883222095, guid: 2d4c3fb9a1bfa39419318f27c4847b43, type: 3}
+      propertyPath: lockonLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8138156394883222095, guid: 2d4c3fb9a1bfa39419318f27c4847b43, type: 3}
+      propertyPath: lockonObstacleLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1353506773417042885, guid: 2d4c3fb9a1bfa39419318f27c4847b43, type: 3}
     m_RemovedGameObjects: []

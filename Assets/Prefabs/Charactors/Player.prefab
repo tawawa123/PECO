@@ -2166,10 +2166,10 @@ MonoBehaviour:
   lockonRange: 20
   lockonLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   lockonObstacleLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
 --- !u!114 &1577214052619834008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2239,7 +2239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyWeaponLayer:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 0
 --- !u!1 &3767048571844369141
 GameObject:
   m_ObjectHideFlags: 0
