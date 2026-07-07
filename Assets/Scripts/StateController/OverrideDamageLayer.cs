@@ -63,7 +63,7 @@ public class OverrideDamageLayer : MonoBehaviour
         }
     }
 
-    public float AnimtionFinish(string animationName)
+    public float AnimationFinish(string animationName)
     {
         if (!_animator.GetCurrentAnimatorStateInfo(1).IsName(animationName))
             return 0;

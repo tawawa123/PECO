@@ -42,7 +42,7 @@ public class BagUI : MonoBehaviour
         {
             var id = kvp.Key;
             var count = kvp.Value;
-            Debug.Log(id);
+            GameLog.Trace(id);
 
             var data = itemDataStore.FindWithId(id);
             if (data != null)

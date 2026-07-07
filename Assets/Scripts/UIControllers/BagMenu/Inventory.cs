@@ -34,7 +34,10 @@ public class Inventory : MonoBehaviour
     {
         if (items.ContainsKey(id))
         {
-            Debug.Log(items.Remove(id));
+            // items.Remove はGAME_LOG未定義でも必ず実行する必要があるため
+            // Trace引数に直接渡さず、結果を受けてからログする
+            bool removed = items.Remove(id);
+            GameLog.Trace(removed);
         }
     }
 

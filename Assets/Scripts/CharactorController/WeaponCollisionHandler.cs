@@ -25,11 +25,11 @@ public class WeaponCollisionHandler : MonoBehaviour
             }
             else if (playerParryController.IsGuarding)
             {
-                Debug.Log("ガード成功！");
+                GameLog.Trace("ガード成功！");
             }
             else
             {
-                Debug.Log("ヒット！ダメージを受ける。");
+                GameLog.Trace("ヒット！ダメージを受ける。");
             }
         }
     }

@@ -70,7 +70,7 @@ public class AwaitableAnimatorState : MonoBehaviour
         }
     }
 
-    public float AnimtionFinish(string animationName)
+    public float AnimationFinish(string animationName)
     {
         if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
             return 0;

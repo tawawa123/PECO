@@ -33,7 +33,7 @@ public class ShortcutManager : MonoBehaviour
         // すでに登録されているかチェック
         if (shortcutSlots.Contains(id))
         {
-            Debug.Log("すでに登録されたアイテムです");
+            GameLog.Trace("すでに登録されたアイテムです");
             return false;
         }
 
@@ -43,13 +43,13 @@ public class ShortcutManager : MonoBehaviour
             if (shortcutSlots[i] == 0)
             {
                 shortcutSlots[i] = id;
-                Debug.Log($"ID:{id} をショートカットに登録しました");
+                GameLog.Trace($"ID:{id} をショートカットに登録しました");
                 RefreshUI();
                 return true;
             }
         }
 
-        Debug.Log("ショートカットがいっぱいです");
+        GameLog.Trace("ショートカットがいっぱいです");
         return false;
     }
 
@@ -59,7 +59,7 @@ public class ShortcutManager : MonoBehaviour
         // すでに登録されているかチェック
         if (transfomationSlots.Contains(id))
         {
-            Debug.Log("すでに登録されたアイテムです");
+            GameLog.Trace("すでに登録されたアイテムです");
             return false;
         }
 
@@ -69,13 +69,13 @@ public class ShortcutManager : MonoBehaviour
             if (transfomationSlots[i] == 0)
             {
                 transfomationSlots[i] = id;
-                Debug.Log($"ID:{id} をショートカットに登録しました");
+                GameLog.Trace($"ID:{id} をショートカットに登録しました");
                 RefreshUI();
                 return true;
             }
         }
 
-        Debug.Log("ショートカットがいっぱいです");
+        GameLog.Trace("ショートカットがいっぱいです");
         return false;
     }
 

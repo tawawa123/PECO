@@ -36,6 +36,10 @@ namespace StateManager
         private const float RotateSpeed = 900f;
         private const float RotateSpeedLockon = 500f;
 
+        // メインカメラ（Camera.mainは内部でタグ検索するため毎フレーム呼ばずキャッシュする）
+        private Camera mainCamera;
+        protected Camera MainCamera => mainCamera;
+
         // 設置判定の大きさ
         private const float isGroundedSize = 0.1f;
 
@@ -81,6 +85,7 @@ namespace StateManager
         public void OnEnter()
         {
             playerStatus = GameManager.Instance.CurrentStatus;
+            mainCamera = Camera.main;
 
             // StateTypeの数だけステートの登録
             stateMachine = new StateMachine<PlayerControlStrategyBase>(this);
@@ -193,7 +198,7 @@ namespace StateManager
             float Angle = Vector3.Angle(closest.transform.forward, ctx.transform.forward);
             if(Mathf.Abs(Angle) < 20.0f){
                 backstab = true;
-                Debug.Log(closest.GetComponent<EnemyStatus>());
+                GameLog.Trace(closest.GetComponent<EnemyStatus>());
                 closest.GetComponent<EnemyStatus>().m_backstabed = true;
             }
 
@@ -233,7 +238,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Idle");
+                GameLog.Trace("start Idle");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Idle", true);
@@ -282,7 +287,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Idle");
+                GameLog.Trace("end Idle");
             }
         }
 
@@ -300,7 +305,7 @@ namespace StateManager
             public override void OnStart()
             {
                 ctx = Owner.ctx;
-                Debug.Log("start Idle");
+                GameLog.Trace("start Idle");
                 ctx.animationState.SetState("Idle", true);
             }
 
@@ -312,7 +317,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Idle");
+                GameLog.Trace("end Idle");
             }
         }
 
@@ -326,15 +331,15 @@ namespace StateManager
             {
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Walk", true);
-                Debug.Log("start walk");
+                GameLog.Trace("start walk");
             }
 
             public override void OnUpdate()
             {
                 Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
 
-                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Vector3 cameraForward = Vector3.Scale(Owner.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Owner.MainCamera.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
                 ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
 
@@ -392,7 +397,7 @@ namespace StateManager
             public override void OnEnd()
             {
                 // Owner.rb.velocity = Vector3.zero;
-                Debug.Log("end walk");
+                GameLog.Trace("end walk");
             }
         }
 
@@ -406,13 +411,13 @@ namespace StateManager
             {
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Run", true);
-                Debug.Log("start run");
+                GameLog.Trace("start run");
             }
 
             public override void OnUpdate()
             {
-                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Vector3 cameraForward = Vector3.Scale(Owner.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Owner.MainCamera.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
                 ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetRunSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
                 Owner.playerStatus.m_stumina -= 0.01f;
@@ -469,7 +474,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end run");
+                GameLog.Trace("end run");
             }
         }
 
@@ -481,7 +486,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Jump");
+                GameLog.Trace("start Jump");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Jump", true);
@@ -491,22 +496,22 @@ namespace StateManager
             public override void OnUpdate()
             {
                 // 方向制御
-                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Vector3 cameraForward = Vector3.Scale(Owner.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Owner.MainCamera.transform.right * Owner.inputHorizontal;
                 ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 // 着地
-                if(ctx.animationState.AnimtionFinish("Jump") >= 0.5f && Owner.isGrounded)
+                if(ctx.animationState.AnimationFinish("Jump") >= 0.5f && Owner.isGrounded)
                 {
                     StateMachine.ChangePrevState();
-                } else if (ctx.animationState.AnimtionFinish("Jump") >= 1f && !Owner.isGrounded) {
+                } else if (ctx.animationState.AnimationFinish("Jump") >= 1f && !Owner.isGrounded) {
                     StateMachine.ChangeState((int) StateType.Fall);
                 }
             }
 
             public override void OnEnd()
             {
-                Debug.Log("end Jump");
+                GameLog.Trace("end Jump");
             }
         }
 
@@ -518,7 +523,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Fall");
+                GameLog.Trace("start Fall");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Fall", true);
@@ -527,8 +532,8 @@ namespace StateManager
             public override void OnUpdate()
             {
                 // 方向制御
-                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Vector3 cameraForward = Vector3.Scale(Owner.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Owner.MainCamera.transform.right * Owner.inputHorizontal;
                 ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
 
                 // 着地
@@ -538,7 +543,7 @@ namespace StateManager
                 }
 
                 // idle
-                if(ctx.animationState.AnimtionFinish("Land") >= 1f)
+                if(ctx.animationState.AnimationFinish("Land") >= 1f)
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
@@ -546,7 +551,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Fall");
+                GameLog.Trace("end Fall");
             }
         }
 
@@ -558,7 +563,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start avoid");
+                GameLog.Trace("start avoid");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Rolling");
@@ -570,18 +575,18 @@ namespace StateManager
             public override void OnUpdate()
             {   
                 // アニメーション終了時の処理
-                if(ctx.animationState.AnimtionFinish("Rolling") >= 0.6f && Input.GetKey(KeyCode.LeftShift))
+                if(ctx.animationState.AnimationFinish("Rolling") >= 0.6f && Input.GetKey(KeyCode.LeftShift))
                 {
                     StateMachine.ChangeState((int) StateType.Run);
                 } 
-                else if(ctx.animationState.AnimtionFinish("Rolling") >= 1f)
+                else if(ctx.animationState.AnimationFinish("Rolling") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
                 ctx.gameObject.layer = LayerMask.NameToLayer("PlayerHit");
-                Debug.Log("end avoid");
+                GameLog.Trace("end avoid");
             }
         }
 
@@ -593,7 +598,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Crouch");
+                GameLog.Trace("start Crouch");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Crouch", true);
@@ -625,7 +630,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Crouch");
+                GameLog.Trace("end Crouch");
                 ctx.gameObject.tag = "Player";
             }
         }
@@ -638,7 +643,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start CrouchWalk");
+                GameLog.Trace("start CrouchWalk");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("CrouchWalk", true);
@@ -649,8 +654,8 @@ namespace StateManager
             {
                 Owner.playerStatus.m_stumina = Mathf.MoveTowards(Owner.playerStatus.GetStumina, 100, Time.deltaTime * 4);
 
-                Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-                Owner.moveForward = cameraForward * Owner.inputVertical + Camera.main.transform.right * Owner.inputHorizontal;
+                Vector3 cameraForward = Vector3.Scale(Owner.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Owner.moveForward = cameraForward * Owner.inputVertical + Owner.MainCamera.transform.right * Owner.inputHorizontal;
                 // 移動方向にスピードを掛ける
                 ctx.rb.velocity = Owner.moveForward * Owner.playerStatus.GetWalkSpeed / 2 + new Vector3(0, ctx.rb.velocity.y, 0);
 
@@ -689,7 +694,7 @@ namespace StateManager
             {
                 ctx.rb.velocity = Vector3.zero;
                 ctx.gameObject.tag = "Player";
-                Debug.Log("end CrouchWalk");
+                GameLog.Trace("end CrouchWalk");
             }
         }
 
@@ -701,7 +706,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start sliding");
+                GameLog.Trace("start sliding");
 
                 ctx = Owner.ctx;
                 ctx.rb.AddForce(ctx.transform.forward * Owner.playerStatus.GetAvoidPower, ForceMode.Impulse);
@@ -710,13 +715,13 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if(ctx.animationState.AnimtionFinish("Sliding") >= 0.75f)
+                if(ctx.animationState.AnimationFinish("Sliding") >= 0.75f)
                     StateMachine.ChangeState((int) StateType.Crouch);
             }
 
             public override void OnEnd()
             {
-                Debug.Log("end Sliding");
+                GameLog.Trace("end Sliding");
             }
         }
 
@@ -728,7 +733,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start hide");
+                GameLog.Trace("start hide");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Hide", true);
@@ -747,7 +752,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end hide");
+                GameLog.Trace("end hide");
                 ctx.gameObject.tag = "Player";
             }
         }
@@ -768,7 +773,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start attack");
+                GameLog.Trace("start attack");
 
                 ctx = Owner.ctx;
 
@@ -791,7 +796,7 @@ namespace StateManager
                 string anim = animNames[phase];
 
                 // アニメ終了判定
-                if (ctx.animationState.AnimtionFinish(anim) > 1.0f)
+                if (ctx.animationState.AnimationFinish(anim) > 1.0f)
                 {
                     ctx.AA.EndAttackHit();
 
@@ -811,7 +816,7 @@ namespace StateManager
             {
                 ctx.AA.EndAttackHit();
                 ctx.weapon.enabled = false;
-                Debug.Log("end attack");
+                GameLog.Trace("end attack");
             }
 
             /// <summary>
@@ -820,7 +825,7 @@ namespace StateManager
             private void StartAttackPhase()
             {
                 string anim = animNames[phase];
-                Debug.Log($"Attack Phase: {phase + 1}");
+                GameLog.Trace($"Attack Phase: {phase + 1}");
 
                 ctx.AA.StartAttackHit();
                 ctx.animationState.SetState(anim, true);
@@ -841,7 +846,7 @@ namespace StateManager
 
                 while (true)
                 {
-                    float t = ctx.animationState.AnimtionFinish(animName);
+                    float t = ctx.animationState.AnimationFinish(animName);
 
                     // アニメ終了したら強制終了
                     if (t >= 1f)
@@ -870,7 +875,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start dashAttack");
+                GameLog.Trace("start dashAttack");
 
                 ctx = Owner.ctx;
                 // 特殊攻撃判定
@@ -897,7 +902,7 @@ namespace StateManager
             public override void OnUpdate()
             {
                 // Idle
-                if(ctx.animationState.AnimtionFinish("DashAttack") > 1.01f){
+                if(ctx.animationState.AnimationFinish("DashAttack") > 1.01f){
                     ctx.AA.EndAttackHit();
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
@@ -907,7 +912,7 @@ namespace StateManager
             {
                 ctx.AA.EndAttackHit();
                 ctx.weapon.enabled = false;
-                Debug.Log("end dashAttack");
+                GameLog.Trace("end dashAttack");
             }
         }
 
@@ -922,7 +927,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start stealthAttack");
+                GameLog.Trace("start stealthAttack");
 
                 ctx = Owner.ctx;
                 cts = new CancellationTokenSource();
@@ -973,14 +978,14 @@ namespace StateManager
                     canAnimationPlay = false;
                 }
 
-                if(ctx.animationState.AnimtionFinish("Land") > 1f)
+                if(ctx.animationState.AnimationFinish("Land") > 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
                 ctx.AA.EndAttackHit();
-                Debug.Log("end stealthAttack");
+                GameLog.Trace("end stealthAttack");
             }
         }
 
@@ -992,7 +997,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start backstab");
+                GameLog.Trace("start backstab");
 
                 ctx = Owner.ctx;
                 if(ctx.GetStealthAttackFlag())
@@ -1006,13 +1011,13 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if(ctx.animationState.AnimtionFinish("Backstab") >= 1f)
+                if(ctx.animationState.AnimationFinish("Backstab") >= 1f)
                     StateMachine.ChangeState((int) StateType.Idle);
             }
 
             public override void OnEnd()
             {
-                Debug.Log("end backstab");
+                GameLog.Trace("end backstab");
             }
         }
 
@@ -1023,19 +1028,19 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Damage");
+                GameLog.Trace("start Damage");
 
                 ctx = Owner.ctx;
-                Debug.Log(Owner.playerStatus.GetHp);
+                GameLog.Trace(Owner.playerStatus.GetHp);
 
-                Debug.Log(ctx.damageLayer);
+                GameLog.Trace(ctx.damageLayer);
                 ctx.damageLayer.SetState("Light_Damage", true);
             }
 
             public override void OnUpdate()
             {
                 // Idle
-                if(ctx.damageLayer.AnimtionFinish("Light_Damage") > 0.7f){
+                if(ctx.damageLayer.AnimationFinish("Light_Damage") > 0.7f){
                     ctx.AA.EndAttackHit();
                     ctx.damageLayer.SetState("None", true);
                     StateMachine.ChangeState((int) StateType.Idle);
@@ -1044,7 +1049,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Damage");
+                GameLog.Trace("end Damage");
             }
         }
 
@@ -1061,7 +1066,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Parry");
+                GameLog.Trace("start Parry");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Parry", true);
@@ -1069,7 +1074,7 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                if(ctx.animationState.AnimtionFinish("Parry") > 1.0f)
+                if(ctx.animationState.AnimationFinish("Parry") > 1.0f)
                 {
                     StateMachine.ChangeState((int) StateType.Idle);
                 }
@@ -1077,7 +1082,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Parry");
+                GameLog.Trace("end Parry");
             }
         }
 
@@ -1094,7 +1099,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Guard");
+                GameLog.Trace("start Guard");
 
                 ctx = Owner.ctx;
                 ctx.animationState.SetState("Guard", true);
@@ -1111,7 +1116,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Guard");
+                GameLog.Trace("end Guard");
             }
         }
 
@@ -1130,7 +1135,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start stun");
+                GameLog.Trace("start stun");
                 
                 ctx = Owner.ctx;
                 // 既存のトークンを破棄し、新しく作成
@@ -1153,7 +1158,7 @@ namespace StateManager
             private async UniTask WaitStun(CancellationToken token)
             {
                 // 待機時間が始まった時、プレイヤーコントローラー側に用意されているフラグを参照してtrueにする
-                Debug.Log("スタン開始");
+                GameLog.Trace("スタン開始");
 
                 // 2.5秒程度の待機時間を設ける
                 bool isCanceled = await UniTask.Delay(
@@ -1162,18 +1167,18 @@ namespace StateManager
                 ).SuppressCancellationThrow();
 
                 // プレイヤーのフラグを解除
-                Debug.Log("追撃された");
+                GameLog.Trace("追撃された");
 
                 if (isCanceled)
                 {
                     // 待機時間中に外部からのキャンセルがあった場合
                     // 硬直 -> ダメージ -> 即座に硬直解除になるらしいので、一旦何もしない
-                    Debug.Log("攻撃を受けました");
+                    GameLog.Trace("攻撃を受けました");
                 }
                 else
                 {
                     // 待機時間中に何もなかったのであれば（時間切れ）
-                    Debug.Log("硬直時間終了。通常戦闘状態に戻ります。");
+                    GameLog.Trace("硬直時間終了。通常戦闘状態に戻ります。");
                     
                     // 通常の状態に戻る
                     Owner.playerStatus.m_stun = false;
@@ -1190,7 +1195,7 @@ namespace StateManager
 
                 // 今スタンしているかどうか
                 Owner.playerStatus.m_stun = false;
-                Debug.Log("end stun");
+                GameLog.Trace("end stun");
             }
         }
 
@@ -1200,17 +1205,17 @@ namespace StateManager
         {
             public override void OnStart()
             {
-                Debug.Log("start gameover");
+                GameLog.Trace("start gameover");
             }
 
             public override void OnUpdate()
             {
-                Debug.Log("やられてしまった！");
+                GameLog.Trace("やられてしまった！");
             }
 
             public override void OnEnd()
             {
-                Debug.Log("end gameover");
+                GameLog.Trace("end gameover");
             }
         }
     }

@@ -52,7 +52,7 @@ public class PlayerParryController : MonoBehaviour
         IsParryActive = true;
         IsParrySuccessful = false;
         
-        Debug.Log("パリィ受付開始！");
+        GameLog.Trace("パリィ受付開始！");
 
         // キャンセルされたかどうかがBoolで返ってくる
         bool isCanceled = await UniTask.Delay(
@@ -67,18 +67,18 @@ public class PlayerParryController : MonoBehaviour
         {
             if (IsParrySuccessful)
             {
-                Debug.Log("パリィ成功");
+                GameLog.Trace("パリィ成功");
             }
             else
             {
-                Debug.Log("なんでここ来たん？ 失敗ですけれども");
+                GameLog.Trace("なんでここ来たん？ 失敗ですけれども");
             }
         }
         else // タイムアウト
         {
             if (!IsParrySuccessful)
             {
-                Debug.Log("パリィ失敗：タイムアウト。");
+                GameLog.Trace("パリィ失敗：タイムアウト。");
             }
         }
         

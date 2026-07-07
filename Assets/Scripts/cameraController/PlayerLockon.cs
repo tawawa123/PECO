@@ -39,7 +39,7 @@ public class PlayerLockon : MonoBehaviour
             float mouseInputX = Input.GetAxis("Mouse X");
             if (mouseInputX > 0.95f)
             {
-                Debug.Log("right: " + mouseInputX);
+                GameLog.Trace("right: " + mouseInputX);
                 GameObject rightEnemy = GetLockonTargetLeftOrRight("right");
                 if (rightEnemy != null)
                 {
@@ -51,7 +51,7 @@ public class PlayerLockon : MonoBehaviour
             }
             else if (mouseInputX < -0.95f)
             {
-                Debug.Log("left: " + mouseInputX);
+                GameLog.Trace("left: " + mouseInputX);
                 GameObject leftEnemy = GetLockonTargetLeftOrRight("left");
                 if (leftEnemy != null)
                 {
@@ -75,7 +75,7 @@ public class PlayerLockon : MonoBehaviour
 
         if (lockonInput)
         {
-            //Debug.Log("isLockon: " + isLockon);
+            //GameLog.Trace("isLockon: " + isLockon);
             // すでにロックオン済みなら解除する
             if (isLockon)
             {
@@ -89,7 +89,7 @@ public class PlayerLockon : MonoBehaviour
 
             // ロックオン対象の検索、いるならロックオン
             targetObj = GetLockonTarget(lockonRange);
-            // Debug.Log("tagetObj: " + targetObj);
+            // GameLog.Trace("tagetObj: " + targetObj);
             if (targetObj)
             {
                 isLockon = true;
@@ -250,7 +250,7 @@ public class PlayerLockon : MonoBehaviour
         RaycastHit[] hits = Physics.SphereCastAll(originTrn.position, lockonRange, Vector3.up, 0, lockonLayers);
         // 2. 1のリスト全てにrayを飛ばし射線が通るものだけをList化
         List<GameObject> hitObjects = makeListRaycastHit(hits);
-        Debug.Log(hitObjects);
+        GameLog.Trace(hitObjects);
         // 3. 2のリスト全てのベクトルとカメラのベクトルを比較し、画面中央に一番近いものを探す
         if (direction.Equals("left"))
         {

@@ -27,7 +27,7 @@ public class EnemySoundListener : MonoBehaviour
 
     public void OnSoundHeard(SoundEvent soundEvent)
     {
-        Debug.Log($"{name} heard sound: {soundEvent.seType}");
+        GameLog.Trace($"{name} heard sound: {soundEvent.seType}");
 
         // ここで EnemyAI に渡す
         var ai = GetComponent<YarikumaControllerStrategy>();

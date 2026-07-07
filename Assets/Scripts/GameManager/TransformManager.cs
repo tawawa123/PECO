@@ -62,6 +62,6 @@ public class TransformManager : MonoBehaviour
         // 現在のプレイヤー情報を更新
         GameManager.Instance.SetPlayerObj(nextPlayer);
         
-        Debug.Log("変身完了！");
+        GameLog.Trace("変身完了！");
     }
 }

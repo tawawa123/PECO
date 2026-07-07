@@ -81,7 +81,7 @@ public class AttackArea : MonoBehaviour
     private void ProcessParried(GameObject target)
     {
         // 敵のアニメーションを硬直させたり、武器の軌道をリセットしたりする処理をここに追加
-        Debug.Log("攻撃をパリィしました！");
+        GameLog.Trace("攻撃をパリィしました！");
         var controller = this.GetComponentInParent<EnemyController>();
 
         controller.ChangeParryedState();
@@ -91,7 +91,7 @@ public class AttackArea : MonoBehaviour
     // ガード成功時のプレイヤー側の処理
     private void ProcessGuardSuccess(GameObject target)
     {
-        Debug.Log("ガード成功！");
+        GameLog.Trace("ガード成功！");
         var controller = target.GetComponentInParent<PlayerController>();
         var status = GameManager.Instance.CurrentStatus;
 

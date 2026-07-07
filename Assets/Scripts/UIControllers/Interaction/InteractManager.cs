@@ -63,24 +63,24 @@ public class InteractManager : MonoBehaviour, Interactable
         if (isTalking) return; // 多重入力防止
         isTalking = true;
 
-        Debug.Log(progress.storyProgress);
+        GameLog.Trace(progress.storyProgress);
         var sequence = conversationData.GetConversation(progress.storyProgress);
         if (sequence == null)
         {
-            Debug.Log($"{conversationData.npcName}: ……");
+            GameLog.Trace($"{conversationData.npcName}: ……");
             isTalking = false;
             return;
         }
 
         foreach (var line in sequence.texts)
         {
-            Debug.Log($"{conversationData.npcName}: {line}");
+            GameLog.Trace($"{conversationData.npcName}: {line}");
 
             // ここで「次へ」キー待ちをする（例：Spaceキー）
             await UniTask.WaitUntil(() => Input.GetKeyDown(KeyCode.P));
         }
 
-        Debug.Log("会話終了。");
+        GameLog.Trace("会話終了。");
         isTalking = false;
         
         // ここでUIに送る処理を追加（例：UIManager.ShowText(text)）
@@ -89,13 +89,13 @@ public class InteractManager : MonoBehaviour, Interactable
     // フィールドオブジェクトに擬態するハイドアクション
     private void Hide()
     {
-        Debug.Log("hiding!");
+        GameLog.Trace("hiding!");
     }
 
     // フィールドアイテムの取得
     private void GetItem()
     {
-        Debug.Log("get item!");
+        GameLog.Trace("get item!");
 
         // インベントリにこのアイテムを追加
         Inventory.Instance.AddItem(itemData.Id, 1);

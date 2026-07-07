@@ -113,7 +113,7 @@ namespace StateManager
 
                 ctx.animator.SetState("Idle", true);
                 ctx.AA.SetAttackArea();
-                Debug.Log("start Idle");
+                GameLog.Trace("start Idle");
             }
 
             public override void OnUpdate()
@@ -127,7 +127,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Idle");
+                GameLog.Trace("end Idle");
             }
         }
 
@@ -146,7 +146,7 @@ namespace StateManager
                 posDelta = Vector3.zero;
                 ctx.nav.SetDestination(ctx.des.GetDestination());
 
-                Debug.Log("start Round");
+                GameLog.Trace("start Round");
             }
 
             public override void OnUpdate()
@@ -202,7 +202,7 @@ namespace StateManager
                     StateMachine.ChangeState((int)StateType.Vigilance);
                 }
 
-                Debug.Log(ctx.estatus.m_vigilancePoint);
+                GameLog.Trace(ctx.estatus.m_vigilancePoint);
                 // ダメージ処理が起きたらここでストップ
                 if(ctx.estatus.m_vigilancePoint >= 100f)
                     StateMachine.ChangeState((int) StateType.Battle);
@@ -210,7 +210,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Round");
+                GameLog.Trace("end Round");
             }
         }
 
@@ -238,7 +238,7 @@ namespace StateManager
                 ctx.animator.SetState("Search", true);
                 ctx.nav.SetDestination(ctx.tf.position);
 
-                Debug.Log("start Vigilance");
+                GameLog.Trace("start Vigilance");
 
                 // 警戒処理の開始
                 cts = new CancellationTokenSource();
@@ -338,7 +338,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Vigilance");
+                GameLog.Trace("end Vigilance");
                 cts.Cancel();
             }
         }
@@ -361,7 +361,7 @@ namespace StateManager
                 posDelta = Vector3.zero;
                 //target_angle = 0;
                 ctx.nav.speed = 4;
-                Debug.Log("start Chase");
+                GameLog.Trace("start Chase");
             }
 
             public override void OnUpdate()
@@ -388,7 +388,7 @@ namespace StateManager
             public override void OnEnd()
             {
                 ctx.nav.speed = 2;
-                Debug.Log("end Chase");
+                GameLog.Trace("end Chase");
             }
         }
 
@@ -426,7 +426,7 @@ namespace StateManager
                 SetNewDestination();
                 ctx.nav.angularSpeed = 0;
 
-                Debug.Log("start Battle");
+                GameLog.Trace("start Battle");
             }
 
             public override void OnUpdate()
@@ -449,7 +449,7 @@ namespace StateManager
                     
                     if (stuckTimer >= STUCK_TIME_LIMIT)
                     {
-                        Debug.Log("立ち往生を検出！移動パスを再計算します。");
+                        GameLog.Trace("立ち往生を検出！移動パスを再計算します。");
                         
                         // 立ち往生と判断された場合、新しい目的地を設定
                         SetNewDestination(); 
@@ -500,7 +500,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Battle");
+                GameLog.Trace("end Battle");
             }
 
             // プレイヤーを中心にした円弧上の座標を取得
@@ -548,7 +548,7 @@ namespace StateManager
                         // 有効なNavMesh上の地点が見つかった場合
                         destination = hit.position;
                         ctx.nav.SetDestination(destination);
-                        Debug.Log($"新しい目的地を設定: {destination}");
+                        GameLog.Trace($"新しい目的地を設定: {destination}");
                         return;
                     }
                 }
@@ -594,13 +594,13 @@ namespace StateManager
                 }
                 
                 ctx.AA.StartAttackHit();
-                Debug.Log("start Attack");
+                GameLog.Trace("start Attack");
             }
 
             public override void OnUpdate()
             {
                 // 攻撃アニメーションが終了したらBattleに遷移
-                if(ctx.animator.AnimtionFinish(
+                if(ctx.animator.AnimationFinish(
                     attackPattarn[currentAnimationNum]) >= 1f)
                 {
                     ctx.AA.EndAttackHit();
@@ -612,7 +612,7 @@ namespace StateManager
             {
                 ctx.rb.isKinematic = true;
                 ctx.nav.isStopped = false;
-                Debug.Log("end Attack");
+                GameLog.Trace("end Attack");
             }
         }
 
@@ -627,8 +627,8 @@ namespace StateManager
 
                 ctx.animator.SetState("Damage", true);
 
-                Debug.Log("start Damage");
-                Debug.Log(ctx.estatus.GetHp);
+                GameLog.Trace("start Damage");
+                GameLog.Trace(ctx.estatus.GetHp);
                 ctx.estatus.m_vigilancePoint = 100f;
                 ctx.animator.SetState("Damage", true);
             }
@@ -637,14 +637,14 @@ namespace StateManager
             {
                 Owner.CheckDeath();
 
-                if(ctx.animator.AnimtionFinish("Damage") >= 1f){
+                if(ctx.animator.AnimationFinish("Damage") >= 1f){
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
 
             public override void OnEnd()
             {
-                Debug.Log("end Damage");
+                GameLog.Trace("end Damage");
             }
         }
 
@@ -663,7 +663,7 @@ namespace StateManager
                 ctx = Owner.ctx;
                 ctx.nav.isStopped = true;
 
-                Debug.Log("start StealthAttacked");
+                GameLog.Trace("start StealthAttacked");
                 ctx.estatus.m_vigilancePoint = 100f;
                 cts = new CancellationTokenSource();
                 ctx.animator.SetState("StealthAttacked", true);
@@ -685,7 +685,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end StealthAttacked");
+                GameLog.Trace("end StealthAttacked");
             }
         }
 
@@ -706,7 +706,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Parryed");
+                GameLog.Trace("start Parryed");
                 
                 ctx = Owner.ctx;
                 playerController = Owner.player.GetComponent<PlayerController>();
@@ -727,7 +727,7 @@ namespace StateManager
             {
                 // 待機時間が始まった時、プレイヤーコントローラー側に用意されているフラグを参照してtrueにする
                 playerController.CanStealthAttack(true);
-                Debug.Log("プレイヤーフラグをON: 追撃可能状態");
+                GameLog.Trace("プレイヤーフラグをON: 追撃可能状態");
                 
                 // パリィされた際に、2.5秒程度の待機時間を設ける
                 bool isCanceled = await UniTask.Delay(
@@ -737,18 +737,18 @@ namespace StateManager
 
                 // プレイヤーのフラグを解除
                 playerController.CanStealthAttack(false);
-                Debug.Log("プレイヤーフラグをOFF: 追撃終了");
+                GameLog.Trace("プレイヤーフラグをOFF: 追撃終了");
 
                 if (isCanceled)
                 {
                     // 待機時間中に外部からのキャンセルがあった場合
-                    Debug.Log("外部からのキャンセル（例: 追撃ヒット）により、硬直を即時終了");
+                    GameLog.Trace("外部からのキャンセル（例: 追撃ヒット）により、硬直を即時終了");
                     ctx.estatus.m_stun = true;
                 }
                 else
                 {
                     // 待機時間中に何もなかったのであれば（時間切れ）
-                    Debug.Log("硬直時間終了。通常戦闘状態に戻ります。");
+                    GameLog.Trace("硬直時間終了。通常戦闘状態に戻ります。");
                     
                     // 通常の状態に戻る
                     ctx.estatus.m_stun = true;
@@ -765,7 +765,7 @@ namespace StateManager
 
                 // 今スタンしているかどうか
                 ctx.estatus.m_stun = true;
-                Debug.Log("end Parryed state.");
+                GameLog.Trace("end Parryed state.");
             }
         }
 
@@ -778,21 +778,21 @@ namespace StateManager
             {
                 ctx = Owner.ctx;
 
-                Debug.Log(ctx.estatus.GetHp);
+                GameLog.Trace(ctx.estatus.GetHp);
 
                 ctx.estatus.m_vigilancePoint = 100f;
                 ctx.animator.SetState("Backstabed", true);
 
                 ctx.nav.speed = 0;
 
-                Debug.Log("start Backstabed");
+                GameLog.Trace("start Backstabed");
             }
 
             public override void OnUpdate()
             {
                 Owner.CheckDeath();
 
-                if(ctx.animator.AnimtionFinish("Backstabed") >= 1f){
+                if(ctx.animator.AnimationFinish("Backstabed") >= 1f){
                     StateMachine.ChangeState((int) StateType.Battle);
                 }
             }
@@ -801,7 +801,7 @@ namespace StateManager
             {
                 ctx.estatus.m_backstabed = false;
                 ctx.nav.speed = 2;
-                Debug.Log("end Backstabed");
+                GameLog.Trace("end Backstabed");
             }
         }
 
@@ -813,7 +813,7 @@ namespace StateManager
 
             public override void OnStart()
             {
-                Debug.Log("start Death");
+                GameLog.Trace("start Death");
 
                 ctx = Owner.ctx;
                 ctx.animator.SetState("Death", true);
@@ -821,8 +821,8 @@ namespace StateManager
 
             public override void OnUpdate()
             {
-                Debug.Log("体力が0になりました");
-                if(ctx.animator.AnimtionFinish("Death") >= 1f){
+                GameLog.Trace("体力が0になりました");
+                if(ctx.animator.AnimationFinish("Death") >= 1f){
                     GameManager.Instance.CheckGameCrear();
                     //ctx.Destroy(this);
                 }
@@ -830,7 +830,7 @@ namespace StateManager
 
             public override void OnEnd()
             {
-                Debug.Log("end Death");
+                GameLog.Trace("end Death");
             }
         }
     }
