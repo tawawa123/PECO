@@ -82,16 +82,27 @@ namespace StateManager
 
         public void Transform(int id)
         {
-            GameManager.Instance.CurrentStatus.m_transform = true;
-            if(id == 0)
+            // 変身先ごとに操作Strategyとm_transformフラグを整合させる。
+            // 未対応のidでフラグだけtrueになる不整合を避けるため、
+            // 実際にStrategyを適用する分岐でのみフラグを設定する。
+            switch (id)
             {
-                GameManager.Instance.CurrentStatus.m_transform = false;
-                ChangeStrategy(new DefaultControllerStrategy(this));
+                case 0: // 変身解除（デフォルトに戻る）
+                    GameManager.Instance.CurrentStatus.m_transform = false;
+                    ChangeStrategy(new DefaultControllerStrategy(this));
+                    break;
+                // case 1000: // クマへ変身（未実装）
+                //     GameManager.Instance.CurrentStatus.m_transform = true;
+                //     ChangeStrategy(new ChangeKumaControllerStrategy(this));
+                //     break;
+                case 1001: // 兵士へ変身
+                    GameManager.Instance.CurrentStatus.m_transform = true;
+                    ChangeStrategy(new ChangeHeisiControllerStrategy(this));
+                    break;
+                default:
+                    Debug.LogWarning($"PlayerController.Transform: 未対応のitemId={id} のため操作方式を変更しません");
+                    break;
             }
-            //if(id == 1000)
-            //   ChangeStrategy(new ChangeKumaControllerStrategy(this));
-            if(id == 1001)
-                ChangeStrategy(new ChangeHeisiControllerStrategy(this));
         }
 
 

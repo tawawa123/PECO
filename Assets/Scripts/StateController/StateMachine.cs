@@ -76,7 +76,8 @@ namespace StateManager
         /// </summary>
         public void OnUpdate()
         {
-            _currentState.OnUpdate();
+            // OnStart前にOnUpdateが呼ばれても落ちないようにガードする
+            _currentState?.OnUpdate();
         }
         
         /// <summary>
