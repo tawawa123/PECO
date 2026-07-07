@@ -6,7 +6,7 @@ using GameUI;
 
 namespace StateManager 
 {
-    public class EnemyController : MonoBehaviour, IEnemyContext, Damagable, StealthAttackable
+    public class EnemyController : MonoBehaviour, IEnemyContext, Damagable, StealthAttackable, IDamageable
     {
         // 現在稼働中のStrategy
         private IEnemyControllStrategy currentStrategy;
@@ -94,6 +94,18 @@ namespace StateManager
             // playerStatus.m_hp -= damage;
             if(!GameManager.Instance.CurrentStatus.GetStun)
                 currentStrategy?.AddDamage(damage);
+        }
+
+        // 攻撃を受けた時の解決(被弾)。旧AttackAreaのEnemyHit分岐を移植。
+        public void TakeHit(in AttackData attack, Vector3 hitPoint)
+        {
+            if (enemyStatus != null)
+                enemyStatus.m_hp -= attack.Damage;
+
+            if (attack.hitEffect != null)
+                Instantiate(attack.hitEffect, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+
+            AddDamage(attack.Damage); // ひるみ(strategy.AddDamage)へ
         }
 
         // 外部から強制的にステートを変更させるための補助関数たち

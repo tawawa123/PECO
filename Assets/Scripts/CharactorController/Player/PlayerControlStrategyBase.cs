@@ -766,6 +766,8 @@ namespace StateManager
             private int phase = 0;        // 攻撃が何段目かのカウント
             private bool comboInput = false;
             private string[] animNames = { "first", "second", "third", "forth" };
+            // 各段のダメージ係数(animNamesと対応)。将来はScriptableObject等へ外部化予定。
+            private float[] phaseMultipliers = { 1.0f, 1.0f, 1.2f, 1.5f };
 
             // 入力受付の開始・終了 normalizedTime
             private float comboStart = 0.4f;
@@ -827,7 +829,11 @@ namespace StateManager
                 string anim = animNames[phase];
                 GameLog.Trace($"Attack Phase: {phase + 1}");
 
-                ctx.AA.StartAttackHit();
+                ctx.AA.Begin(new AttackData
+                {
+                    baseDamage = Owner.playerStatus.GetAtkDamage,
+                    motionMultiplier = phaseMultipliers[phase],
+                });
                 ctx.animationState.SetState(anim, true);
                 Owner.playerStatus.m_stumina -= 10.0f;
 
@@ -873,6 +879,9 @@ namespace StateManager
         {
             StateManager.PlayerController ctx;
 
+            // ダッシュ攻撃のダメージ係数
+            private const float DashAttackMultiplier = 1.3f;
+
             public override void OnStart()
             {
                 GameLog.Trace("start dashAttack");
@@ -894,7 +903,11 @@ namespace StateManager
                 }
 
                 ctx.weapon.enabled = true;
-                ctx.AA.StartAttackHit();
+                ctx.AA.Begin(new AttackData
+                {
+                    baseDamage = Owner.playerStatus.GetAtkDamage,
+                    motionMultiplier = DashAttackMultiplier,
+                });
                 Owner.playerStatus.m_stumina -= 15f;
                 ctx.animationState.SetState("DashAttack", true);
             }

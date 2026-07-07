@@ -6,7 +6,7 @@ using GameUI;
 
 namespace StateManager 
 {
-    public class PlayerController : MonoBehaviour, IPlayerContext, Damagable
+    public class PlayerController : MonoBehaviour, IPlayerContext, Damagable, IDamageable
     {
         public event Action OnParrySuccess;
 
@@ -110,6 +110,36 @@ namespace StateManager
             // playerStatus.m_hp -= damage;
             if(!GameManager.Instance.CurrentStatus.GetStun)
                 currentStrategy?.AddDamage(damage);
+        }
+
+        // 攻撃を受けた時の解決(パリィ/ガード/被弾)。旧AttackAreaのPlayerHit分岐を移植。
+        public void TakeHit(in AttackData attack, Vector3 hitPoint)
+        {
+            var parry = GetComponent<PlayerParryController>();
+            if (parry != null)
+            {
+                // パリィ受付中: 成功させ、攻撃してきた敵をよろけさせる
+                if (parry.IsParryActive)
+                {
+                    parry.NotifyParrySuccess();
+                    attack.attacker?.GetComponentInParent<EnemyController>()?.ChangeParryedState();
+                    return;
+                }
+                // ガード中: スタミナを多めに消費して被弾を防ぐ
+                if (parry.IsGuarding)
+                {
+                    GameManager.Instance.CurrentStatus.m_stumina -= 15;
+                    return;
+                }
+            }
+
+            // 通常被弾
+            var status = GameManager.Instance.CurrentStatus;
+            status.m_hp -= attack.Damage;
+            if (!status.GetStun)
+                status.m_stumina -= 10;
+
+            AddDamage(attack.Damage); // ひるみ(StateDamage)へ
         }
 
         // 外部から強制的にステートを変更させるための補助関数たち
