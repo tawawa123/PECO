@@ -131,10 +131,8 @@ public class AttackArea : MonoBehaviour
         }
         
         // インターフェイス呼び出し
-        var damagetarget = (statusType == "PlayerStatus") 
-            ? other.gameObject.GetComponent<Damagable>()
-            : other.gameObject.GetComponent<Damagable>();
-        
+        var damagetarget = other.gameObject.GetComponent<Damagable>();
+
         if (damagetarget != null)
         {
             damagetarget.AddDamage(AttackDamage);
