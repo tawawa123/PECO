@@ -78,3 +78,9 @@
 *.unitypackage filter=lfs diff=lfs merge=lfs -text
 *.apk filter=lfs diff=lfs merge=lfs -text
 LightingData.asset filter=lfs diff=lfs merge=lfs -text
+
+## テキストYAMLの .asset はLFS管理から除外（差分・マージ可能に保つ） ##
+# ProjectSettings や埋め込みパッケージの設定・Presetはテキストのまま扱う。
+# バイナリの LightingData.asset は上のルールでLFS対象のまま。
+ProjectSettings/*.asset !filter !diff !merge
+Packages/**/*.asset !filter !diff !merge
